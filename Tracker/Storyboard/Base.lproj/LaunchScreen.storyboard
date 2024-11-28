@@ -16,14 +16,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="launchScreenLogo" translatesAutoresizingMaskIntoConstraints="NO" id="DEn-iF-nxV">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" image="launchScreenLogo" translatesAutoresizingMaskIntoConstraints="NO" id="DEn-iF-nxV">
                                 <rect key="frame" x="76" y="371" width="240" height="128"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="launchScreenBackground"/>
                         <constraints>
-                            <constraint firstItem="DEn-iF-nxV" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="c5X-r2-I1I"/>
                             <constraint firstItem="DEn-iF-nxV" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="eLZ-Pi-kAP"/>
                         </constraints>
                     </view>
