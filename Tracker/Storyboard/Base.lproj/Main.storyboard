@@ -1,96 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
-        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <scenes>
-        <!--OnboardingScreen-->
-        <scene sceneID="tne-QT-ifu">
-            <objects>
-                <viewController id="BYZ-38-t0r" userLabel="OnboardingScreen" customClass="ViewController" customModule="Tracker" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HmM-V5-opz">
-                                <rect key="frame" x="20" y="727" width="353" height="60"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Вот это технологии!">
-                                    <color key="baseBackgroundColor" name="ButtonColor"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <segue destination="LHh-Sc-Et0" kind="show" id="Bnp-4U-8l0"/>
-                                </connections>
-                            </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="onboardingScreen1" translatesAutoresizingMaskIntoConstraints="NO" id="FxS-dw-cOk">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                            </imageView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="HmM-V5-opz" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="Bse-IR-fjc"/>
-                            <constraint firstItem="FxS-dw-cOk" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="Cfm-vw-L16"/>
-                            <constraint firstAttribute="trailing" secondItem="HmM-V5-opz" secondAttribute="trailing" constant="20" id="Fl6-5a-XBB"/>
-                            <constraint firstItem="FxS-dw-cOk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="dFK-hk-kY9"/>
-                            <constraint firstItem="HmM-V5-opz" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="668" id="erc-Oz-iT1"/>
-                            <constraint firstAttribute="trailing" secondItem="FxS-dw-cOk" secondAttribute="trailing" id="sAy-yf-6h3"/>
-                            <constraint firstAttribute="bottom" secondItem="FxS-dw-cOk" secondAttribute="bottom" id="yap-gQ-Axz"/>
-                        </constraints>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="83" y="-2"/>
-        </scene>
-        <!--MainScreen-->
-        <scene sceneID="Mqb-18-7ly">
-            <objects>
-                <viewController id="LHh-Sc-Et0" userLabel="MainScreen" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="NgQ-oR-NKd">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ed6-pF-lQu">
-                                <rect key="frame" x="0.0" y="758" width="393" height="84"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="84" id="xcT-g3-wKT"/>
-                                </constraints>
-                                <items>
-                                    <tabBarItem title="" image="Trackers" id="lse-De-DHA"/>
-                                    <tabBarItem title="" image="Statistic" id="Kmv-SR-nQa"/>
-                                </items>
-                            </tabBar>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="FSU-E0-o5b"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="FSU-E0-o5b" firstAttribute="trailing" secondItem="Ed6-pF-lQu" secondAttribute="trailing" id="6gU-NF-Hfm"/>
-                            <constraint firstItem="Ed6-pF-lQu" firstAttribute="leading" secondItem="FSU-E0-o5b" secondAttribute="leading" id="GHF-q4-Fku"/>
-                            <constraint firstItem="Ed6-pF-lQu" firstAttribute="bottom" secondItem="NgQ-oR-NKd" secondAttribute="bottom" id="JEp-xg-jfn"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="RBS-Nj-3xA"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="LO2-og-RQm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="82" y="718"/>
-        </scene>
-    </scenes>
-    <resources>
-        <image name="Statistic" width="75" height="50"/>
-        <image name="Trackers" width="75" height="50"/>
-        <image name="onboardingScreen1" width="375" height="812"/>
-        <namedColor name="ButtonColor">
-            <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-    </resources>
+    <scenes/>
 </document>
