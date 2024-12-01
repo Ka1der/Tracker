@@ -1,0 +1,81 @@
+//
+//  TrackerCell.swift
+//  Tracker
+//
+//  Created by Kaider on 01.12.2024.
+//
+
+import UIKit
+
+final class TrackerCell: UICollectionViewCell {
+    
+    static let identifier: String = "TrackerCell"
+    
+    private lazy var cardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 16
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var emojiView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white.withAlphaComponent(0.3)
+        view.layer.cornerRadius = 12
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var emojiLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        setupViews()
+    }
+       
+       private func setupViews() {
+           contentView.addSubview(cardView)
+           cardView.addSubview(emojiView)
+           emojiView.addSubview(emojiLabel)
+           cardView.addSubview(titleLabel)
+           
+           NSLayoutConstraint.activate([
+               cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
+               cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+               cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+               cardView.heightAnchor.constraint(equalToConstant: 90),
+               
+               emojiView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
+               emojiView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
+               emojiView.heightAnchor.constraint(equalToConstant: 24),
+               emojiView.widthAnchor.constraint(equalToConstant: 24),
+               
+               emojiLabel.centerXAnchor.constraint(equalTo: emojiView.centerXAnchor),
+               emojiLabel.centerYAnchor.constraint(equalTo: emojiView.centerYAnchor),
+               
+               titleLabel.topAnchor.constraint(equalTo: emojiView.bottomAnchor, constant: 8),
+               titleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
+               titleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12)
+           ])
+       }
+       
+       func configure(title: String, emoji: String) {
+           titleLabel.text = title
+           emojiLabel.text = emoji
+           cardView.backgroundColor = .red
+       }
+   }

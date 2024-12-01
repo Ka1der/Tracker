@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NavigationBarViewController: UIViewController {
+final class NavigationBarViewController: UIViewController  {
     
     private lazy var navigationBar: UIView = {
         let view = UIView()
@@ -74,11 +74,26 @@ final class NavigationBarViewController: UIViewController {
         return label
     }()
     
+    private lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .systemBackground
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
+           return collectionView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         setupNavigationBar()
         setupPlaceholder()
+        setupCollectionView()
     }
     
     private func setupViews() {
@@ -91,6 +106,7 @@ final class NavigationBarViewController: UIViewController {
         placeholderStack.addArrangedSubview(placeholderImageView)
         placeholderStack.addArrangedSubview(placeholderLabel)
         view.addSubview(placeholderStack)
+        view.addSubview(collectionView)
     }
     
     private func setupNavigationBar() {
@@ -123,10 +139,20 @@ final class NavigationBarViewController: UIViewController {
         placeholderStack.isHidden = false
         
         NSLayoutConstraint.activate([
-        placeholderStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        placeholderStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
-        placeholderImageView.heightAnchor.constraint(equalToConstant: 80)
+            placeholderStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeholderStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
+            placeholderImageView.heightAnchor.constraint(equalToConstant: 80)
+        ])
+    }
+    
+    private func setupCollectionView() {
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
