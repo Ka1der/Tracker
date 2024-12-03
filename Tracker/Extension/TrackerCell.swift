@@ -11,6 +11,8 @@ final class TrackerCell: UICollectionViewCell {
     
     static let identifier: String = "TrackerCell"
     
+//    var cellColor: UIColor
+    
     private lazy var cardView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
@@ -19,7 +21,7 @@ final class TrackerCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var titleLabel: UILabel = {
+     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
         label.font = .systemFont(ofSize: 12, weight: .medium)

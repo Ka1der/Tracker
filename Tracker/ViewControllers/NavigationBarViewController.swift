@@ -9,6 +9,8 @@ import UIKit
 
 final class NavigationBarViewController: UIViewController  {
     
+    private var selectedCell: TrackerCell?
+    
     private lazy var navigationBar: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -85,8 +87,24 @@ final class NavigationBarViewController: UIViewController  {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
-           return collectionView
+        
+        collectionView.register(UICollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "header")
+        collectionView.register(UICollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: "footer")
+        
+        return collectionView
     }()
+    
+    var trackers: [TrackerData] = [
+        TrackerData(title: "Медитация", emoji: "🧘‍♂️", color: .white),
+        TrackerData(title: "Спорт", emoji: "🏃‍♂️", color: .white),
+        TrackerData(title: "Чтение", emoji: "📚", color: .white),
+        TrackerData(title: "Сон", emoji: "😴", color: .white),
+        TrackerData(title: "Английский", emoji: "📖", color: .white)
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -158,5 +176,19 @@ final class NavigationBarViewController: UIViewController  {
     
     @objc private func addButtonTapped() {
         print("\(#file):\(#line)] \(#function) Plus button tapped")
+    }
+}
+
+extension NavigationBarViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        // Убираем выделение с предыдущей ячейки
+        selectedCell?.titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        
+        // Выделяем новую ячейку
+        let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
+        cell?.titleLabel.font = .boldSystemFont(ofSize: 17)
+        
+        // Сохраняем ссылку на выделенную ячейку
+        selectedCell = cell
     }
 }
