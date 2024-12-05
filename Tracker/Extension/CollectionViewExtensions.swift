@@ -7,10 +7,14 @@
 
 import UIKit
 
-extension NavigationBarViewController: UICollectionViewDataSource {
+extension TrackersViewController: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return categories.count
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return trackers.count
+        return categories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -21,69 +25,88 @@ extension NavigationBarViewController: UICollectionViewDataSource {
             print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
             return UICollectionViewCell()
         }
-        let tracker = trackers[indexPath.item]
-        cell.configure(title: tracker.title, emoji: tracker.emoji)
-        cell.backgroundColor = tracker.color
+        
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let isCompleted = isTrackerCompleted(tracker, date: currentDate)
+        
+        cell.configure(with: tracker)
+        cell.configureCompletionHandler(
+            tracker: tracker,
+            isCompleted: isCompleted
+        ) { [weak self] in
+            guard let self = self else { return }
+            if isCompleted {
+                self.removeTrackerRecord(tracker, date: self.currentDate)
+            } else {
+                self.addTrackerRecord(tracker, date: self.currentDate)
+            }
+        }
+        
         return cell
     }
     
+    func toggleTracker(_ tracker: Tracker) {
+        let calendar = Calendar.current
+        let trackerID = tracker.id
+        
+        if let index = completedTrackers.firstIndex(where: { record in
+            record.id == trackerID && calendar.isDate(record.date, inSameDayAs: currentDate)
+        }) {
+            completedTrackers.remove(at: index)
+        } else {
+            let record = TrackerRecord(id: trackerID, date: currentDate)
+            completedTrackers.append(record)
+        }
+        
+        collectionView.reloadData()
+    }
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionHeader {
-               let header = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-                      withReuseIdentifier: "header",
-                      for: indexPath
-                  )
-                  
-                  // Создаем и настраиваем лейбл в хедере
-                  let label = UILabel()
-                  label.text = "30 ноября" //  текст хедера
-                  label.font = .boldSystemFont(ofSize: 16)
-                  label.translatesAutoresizingMaskIntoConstraints = false
-                  
-                  header.addSubview(label)
-                  
-                  NSLayoutConstraint.activate([
-                      label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 16),
-                      label.centerYAnchor.constraint(equalTo: header.centerYAnchor)
-                  ])
-                  
-                  return header
-              } else {
-                  let footer = collectionView.dequeueReusableSupplementaryView(
-                      ofKind: kind,
-                      withReuseIdentifier: "footer",
-                      for: indexPath
-                  )
-                  
-                  // Настраиваем футер аналогично
-                  let label = UILabel()
-                  label.text = "Выполнено: 5" // текст футера
-                  label.font = .systemFont(ofSize: 14)
-                  label.translatesAutoresizingMaskIntoConstraints = false
-                  
-                  footer.addSubview(label)
-                  
-                  NSLayoutConstraint.activate([
-                      label.leadingAnchor.constraint(equalTo: footer.leadingAnchor, constant: 16),
-                      label.centerYAnchor.constraint(equalTo: footer.centerYAnchor)
-                  ])
-                  
-                  return footer
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: "header",
+                for: indexPath
+            ) as? SupplementaryView else {
+                print("\(#file):\(#line)] \(#function) Ошибка приведения типа header view")
+                return UICollectionReusableView()
+            }
+            
+            view.titleLabel.text = categories[indexPath.section].title
+            return view
+            
+        case UICollectionView.elementKindSectionFooter:
+            guard let view = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: "footer",
+                for: indexPath
+            ) as? SupplementaryView else {
+                print("\(#file):\(#line)] \(#function) Ошибка приведения типа footer view")
+                return UICollectionReusableView()
+            }
+            
+            let completedCount = completedTrackers.count
+            view.titleLabel.text = "Выполнено: \(completedCount)"
+            return view
+            
+        default:
+            print("\(#file):\(#line)] \(#function) Запрошен неизвестный тип supplementary view: \(kind)")
+            return UICollectionReusableView()
         }
     }
-
+    
     // Размеры хедера/футера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
     }
 }
-    
-extension NavigationBarViewController: UICollectionViewDelegateFlowLayout {
+
+extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 167, height: 148)
@@ -101,4 +124,3 @@ extension NavigationBarViewController: UICollectionViewDelegateFlowLayout {
         return UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     }
 }
-

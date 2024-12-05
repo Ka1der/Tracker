@@ -9,7 +9,7 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     
-    let trackerNavigationController = NavigationBarViewController()
+    let trackerNavigationController = TrackersViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()

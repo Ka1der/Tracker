@@ -7,9 +7,12 @@
 
 import UIKit
 
-final class NavigationBarViewController: UIViewController  {
+final class TrackersViewController: UIViewController  {
     
     private var selectedCell: TrackerCell?
+    var categories: [TrackerCategory] = []
+    var currentDate: Date = Date()
+    var completedTrackers: [TrackerRecord] = []
     
     private lazy var navigationBar: UIView = {
         let view = UIView()
@@ -76,7 +79,7 @@ final class NavigationBarViewController: UIViewController  {
         return label
     }()
     
-    private lazy var collectionView: UICollectionView = {
+    lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         
@@ -85,26 +88,21 @@ final class NavigationBarViewController: UIViewController  {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
         
-        collectionView.register(UICollectionReusableView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: "header")
-        collectionView.register(UICollectionReusableView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: "footer")
+        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
+        collectionView.register(
+            SupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: "header"
+        )
+        collectionView.register(
+            SupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: "footer"
+        )
         
         return collectionView
     }()
-    
-    var trackers: [TrackerData] = [
-        TrackerData(title: "Медитация", emoji: "🧘‍♂️", color: .white),
-        TrackerData(title: "Спорт", emoji: "🏃‍♂️", color: .white),
-        TrackerData(title: "Чтение", emoji: "📚", color: .white),
-        TrackerData(title: "Сон", emoji: "😴", color: .white),
-        TrackerData(title: "Английский", emoji: "📖", color: .white)
-    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,6 +110,8 @@ final class NavigationBarViewController: UIViewController  {
         setupNavigationBar()
         setupPlaceholder()
         setupCollectionView()
+        setupDateFormatter()
+        setupTestData()
     }
     
     private func setupViews() {
@@ -177,18 +177,83 @@ final class NavigationBarViewController: UIViewController  {
     @objc private func addButtonTapped() {
         print("\(#file):\(#line)] \(#function) Plus button tapped")
     }
+    
+    func addTrackerRecord(_ tracker: Tracker, date: Date) {
+        let record = TrackerRecord(id: tracker.id, date: date)
+        completedTrackers.append(record)
+        collectionView.reloadData()
+    }
+    
+    func removeTrackerRecord(_ tracker: Tracker, date: Date) {
+        completedTrackers.removeAll { record in
+            record.id == tracker.id && Calendar.current.isDate(record.date, inSameDayAs: date)
+        }
+        collectionView.reloadData()
+    }
+    
+    func isTrackerCompleted(_ tracker: Tracker, date: Date) -> Bool {
+        completedTrackers.contains { record in
+            record.id == tracker.id && Calendar.current.isDate(record.date, inSameDayAs: date)
+        }
+    }
+    
+    private func setupTestData() {
+        let testTrackers = [
+            Tracker(
+                id: UUID(), title: "Учеба", color: .systemBlue, emoji: "📚", scheldue: Set([.monday, .friday, .saturday]), isPinned: false),
+            Tracker(
+                id: UUID(), title: "Спорт", color: .systemGreen, emoji: "🏃‍♂️", scheldue: Set([ .friday, .saturday, .tuesday]), isPinned: false),
+        ]
+        
+        categories = [TrackerCategory(title: "Важное", trackers: testTrackers)]
+        collectionView.reloadData()
+       // placeholder написать скрытие
+        print("\(#file):\(#line)] \(#function) Добавлены тестовые данные: \(categories.count) категорий")
+    }
 }
 
-extension NavigationBarViewController: UICollectionViewDelegate {
+extension TrackersViewController: UICollectionViewDelegate {
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // Убираем выделение с предыдущей ячейки
         selectedCell?.titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        
-        // Выделяем новую ячейку
         let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
         cell?.titleLabel.font = .boldSystemFont(ofSize: 17)
-        
-        // Сохраняем ссылку на выделенную ячейку
         selectedCell = cell
+        print("\(#file):\(#line)] \(#function) Выделена ячейка: \(indexPath.item)")
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { suggestedActions in
+            let pinAction = UIAction(title: "Закрепить", image: UIImage(systemName: "pin")) { [weak self] _ in
+                print("\(#file):\(#line)] \(#function) Закрепить трекер")
+            }
+            
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { [weak self] _ in
+                print("\(#file):\(#line)] \(#function) Редактировать трекер")
+            }
+            
+            let deleteAction = UIAction(title: "Удалить",
+                                        image: UIImage(systemName: "trash"),
+                                        attributes: .destructive) { [weak self] _ in
+                print("\(#file):\(#line)] \(#function) Удалить трекер")
+            }
+            
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell {
+            cell.titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        }
+        selectedCell = nil
+        print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
+    }
+    
+    private func setupDateFormatter() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yy"
+        dateButton.setTitle(dateFormatter.string(from: currentDate), for: .normal)
+    }
+    
 }
