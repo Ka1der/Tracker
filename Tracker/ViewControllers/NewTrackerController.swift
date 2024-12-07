@@ -65,7 +65,9 @@ final class NewTrackerController: UIViewController {
     }
     
     @objc private func habitButtonTapped() {
-        print("\(#file):\(#line)] \(#function) Нажата кнопка Привычка")
+        let newHabitController = NewHabitController()
+        print("\(#file):\(#line)] \(#function) Переход к созданию новой привычки")
+        present(newHabitController, animated: true)
     }
     
     @objc private func irregularEventButtonTapped() {

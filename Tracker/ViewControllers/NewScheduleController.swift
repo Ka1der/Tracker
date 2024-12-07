@@ -1,0 +1,137 @@
+//
+//  NewScheduleController.swift
+//  Tracker
+//
+//  Created by Kaider on 07.12.2024.
+//
+
+import UIKit
+
+final class NewScheduleController: UIViewController {
+    
+    // MARK: - Properties
+    private var selectedWeekDays: Set<WeekDay> = []
+    
+    // MARK: - UI Elements
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Расписание"
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var stackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 16
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private lazy var doneButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Готово", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .black
+        button.layer.cornerRadius = 16
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        setupViews()
+        setupWeekDaysControls()
+    }
+    
+    // MARK: - Setup
+    private func setupViews() {
+        [titleLabel, stackView, doneButton].forEach { view.addSubview($0) }
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            doneButton.heightAnchor.constraint(equalToConstant: 60)
+        ])
+    }
+    
+    private func setupWeekDaysControls() {
+        WeekDay.allCases.forEach { day in
+            let containerView = createWeekDayControl(for: day)
+            stackView.addArrangedSubview(containerView)
+            
+            NSLayoutConstraint.activate([
+                containerView.heightAnchor.constraint(equalToConstant: 75)
+            ])
+        }
+    }
+    
+    private func createWeekDayControl(for day: WeekDay) -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        
+        let label = UILabel()
+        label.text = day.shortName
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        let toggle = UISwitch()
+        toggle.onTintColor = .systemBlue
+        toggle.tag = day.rawValue
+        toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        
+        let separator = UIView()
+        separator.backgroundColor = .systemGray5
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        
+        container.addSubview(label)
+        container.addSubview(toggle)
+        container.addSubview(separator)
+        
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
+            label.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            
+            toggle.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
+            toggle.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            
+            separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
+            separator.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
+            separator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            separator.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
+        
+        return container
+    }
+    
+    // MARK: - Actions
+    @objc private func switchChanged(_ sender: UISwitch) {
+        guard let day = WeekDay(rawValue: sender.tag) else { return }
+        
+        if sender.isOn {
+            selectedWeekDays.insert(day)
+        } else {
+            selectedWeekDays.remove(day)
+        }
+        
+        print("\(#file):\(#line)] \(#function) Выбранные дни: \(selectedWeekDays)")
+    }
+    
+    @objc private func doneButtonTapped() {
+        print("\(#file):\(#line)] \(#function) Сохранено расписание. Выбранные дни: \(selectedWeekDays)")
+        dismiss(animated: true)
+    }
+}
