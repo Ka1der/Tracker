@@ -79,6 +79,17 @@ final class TrackersViewController: UIViewController  {
         return label
     }()
     
+    private lazy var datePicker: UIDatePicker = {
+        let picker = UIDatePicker()
+        picker.preferredDatePickerStyle = .compact
+        picker.datePickerMode = .date
+        picker.locale = Locale(identifier: "ru_RU")
+        picker.calendar.firstWeekday = 2
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+        return picker
+    }()
+    
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -112,6 +123,7 @@ final class TrackersViewController: UIViewController  {
         setupCollectionView()
         setupDateFormatter()
         setupTestData()
+        updatePlaceholderVisibility()
     }
     
     private func setupViews() {
@@ -176,6 +188,21 @@ final class TrackersViewController: UIViewController  {
     
     @objc private func addButtonTapped() {
         print("\(#file):\(#line)] \(#function) Plus button tapped")
+    }
+    
+    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
+        currentDate = sender.date
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
+        print("\(#file):\(#line)] \(#function) Выбрана дата: \(sender.date)")
+    }
+    
+    private func updatePlaceholderVisibility() {
+        let hasTrackers = categories.contains { !$0.trackers.isEmpty }
+        placeholderStack.isHidden = hasTrackers
+        collectionView.isHidden = !hasTrackers
+        
+        print("\(#file):\(#line)] \(#function) Статус отображения заглушки: \(!hasTrackers)")
     }
     
     func addTrackerRecord(_ tracker: Tracker, date: Date) {
