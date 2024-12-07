@@ -187,7 +187,11 @@ final class TrackersViewController: UIViewController  {
     }
     
     @objc private func addButtonTapped() {
-        print("\(#file):\(#line)] \(#function) Plus button tapped")
+        let newTrackerController = NewTrackerController()
+        newTrackerController.title = "Создание трекера"
+        let navigationController = UINavigationController(rootViewController: newTrackerController)
+        navigationController.modalPresentationStyle = .automatic
+        present(navigationController, animated: true)
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
