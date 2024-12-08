@@ -10,40 +10,37 @@ import UIKit
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        return filteredCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
-    }
+          return filteredCategories[section].trackers.count
+      }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: TrackerCell.identifier,
-            for: indexPath
-        ) as? TrackerCell else {
-            print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
-            return UICollectionViewCell()
-        }
-        
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
-        let isCompleted = isTrackerCompleted(tracker, date: currentDate)
-        
-        cell.configure(with: tracker)
-        cell.configureCompletionHandler(
-            tracker: tracker,
-            isCompleted: isCompleted
-        ) { [weak self] in
-            guard let self = self else { return }
-            if isCompleted {
-                self.removeTrackerRecord(tracker, date: self.currentDate)
-            } else {
-                self.addTrackerRecord(tracker, date: self.currentDate)
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: TrackerCell.identifier,
+                for: indexPath
+            ) as? TrackerCell else {
+                print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
+                return UICollectionViewCell()
             }
+            
+            let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
+            let isCompleted = isTrackerCompleted(tracker, date: currentDate)
+            let completedCount = countCompletedDays(for: tracker)
+            
+            cell.configure(
+                with: tracker,
+                currentDate: currentDate,
+                completedDaysCount: completedCount,
+                isCompleted: isCompleted
+            )
+            
+            print("\(#file):\(#line)] \(#function) Настройка ячейки для трекера: \(tracker.title), дата: \(currentDate)")
+            
+            return cell
         }
-        
-        return cell
-    }
     
     func toggleTracker(_ tracker: Tracker) {
         let calendar = Calendar.current
@@ -96,7 +93,6 @@ extension TrackersViewController: UICollectionViewDataSource {
         }
     }
     
-    // Размеры хедера/футера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
     }

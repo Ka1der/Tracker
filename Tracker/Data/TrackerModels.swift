@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - Models
+
 struct Tracker {
     let id: UUID
     let title: String
@@ -15,6 +17,8 @@ struct Tracker {
     let scheldue: Set<WeekDay>
     let isPinned: Bool
 }
+
+// MARK: - Enums
 
 enum WeekDay: Int, CaseIterable {
     case monday = 1
@@ -37,6 +41,8 @@ enum WeekDay: Int, CaseIterable {
         }
     }
 }
+
+// MARK: - Supporting Types
 
 struct TrackerRecord {
     let id: UUID // ID трекера

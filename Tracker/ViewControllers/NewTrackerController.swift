@@ -9,6 +9,8 @@ import UIKit
 
 final class NewTrackerController: UIViewController {
     
+    weak var delegate: NewHabitControllerDelegate?
+    
     private lazy var habitButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -66,6 +68,7 @@ final class NewTrackerController: UIViewController {
     
     @objc private func habitButtonTapped() {
         let newHabitController = NewHabitController()
+        newHabitController.delegate = delegate
         print("\(#file):\(#line)] \(#function) Переход к созданию новой привычки")
         present(newHabitController, animated: true)
     }

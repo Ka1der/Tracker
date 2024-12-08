@@ -11,6 +11,7 @@ final class NewScheduleController: UIViewController {
     
     // MARK: - Properties
     private var selectedWeekDays: Set<WeekDay> = []
+    weak var delegate: NewScheduleControllerDelegate?
     
     // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
@@ -131,7 +132,8 @@ final class NewScheduleController: UIViewController {
     }
     
     @objc private func doneButtonTapped() {
-        print("\(#file):\(#line)] \(#function) Сохранено расписание. Выбранные дни: \(selectedWeekDays)")
-        dismiss(animated: true)
-    }
-}
+           delegate?.didUpdateSchedule(selectedWeekDays)
+           print("\(#file):\(#line)] \(#function) Сохранено расписание: \(selectedWeekDays)")
+           dismiss(animated: true)
+       }
+   }

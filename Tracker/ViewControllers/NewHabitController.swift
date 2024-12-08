@@ -9,6 +9,13 @@ import UIKit
 
 final class NewHabitController: UIViewController {
     
+    // MARK: - Properties
+    
+    weak var delegate: NewHabitControllerDelegate?
+    private var schedule: Set<WeekDay> = []
+    
+    // MARK: - UI Elements
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Новая привычка"
@@ -78,11 +85,15 @@ final class NewHabitController: UIViewController {
         return button
     }()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupViews()
     }
+    
+    // MARK: - Setup Methods
     
     private func setupViews() {
         [titleLabel, nameTextField, categoryButton, scheduleButton, cancelButton, createButton].forEach {
@@ -120,18 +131,50 @@ final class NewHabitController: UIViewController {
         ])
     }
     
+    // MARK: - Actions
+    
     @objc private func cancelButtonTapped() {
         dismiss(animated: true)
         print("\(#file):\(#line)] \(#function) Нажата кнопка Отменить")
     }
     
     @objc private func createButtonTapped() {
-        print("\(#file):\(#line)] \(#function) Нажата кнопка Создать")
+        guard let title = nameTextField.text, !title.isEmpty else {
+            print("\(#file):\(#line)] \(#function) Ошибка: пустое название трекера")
+            return
+        }
+        
+        let newTracker = Tracker(
+            id: UUID(),
+            title: title,
+            color: .systemBlue,
+            emoji: "📝",
+            scheldue: schedule,
+            isPinned: false
+        )
+        
+        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', расписание - [\(schedule.map { $0.shortName }.joined(separator: ", "))]")
+        
+        delegate?.didCreateTracker(newTracker, category: "Новая категория")
+        dismiss(animated: true)
     }
     
     @objc private func scheduleButtonTapped() {
         let scheduleController = NewScheduleController()
+        scheduleController.delegate = self
         print("\(#file):\(#line)] \(#function) Переход к выбору расписания")
         present(scheduleController, animated: true)
+    }
+}
+
+// MARK: - NewScheduleControllerDelegate
+
+extension NewHabitController: NewScheduleControllerDelegate {
+    func didUpdateSchedule(_ schedule: Set<WeekDay>) {
+        self.schedule = schedule
+        print("\(#file):\(#line)] \(#function) Получено расписание: \(schedule)")
+        
+        let weekDays = schedule.map { $0.shortName }.joined(separator: ", ")
+        scheduleButton.setTitle(schedule.isEmpty ? "Расписание" : weekDays, for: .normal)
     }
 }

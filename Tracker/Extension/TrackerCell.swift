@@ -9,7 +9,13 @@ import UIKit
 
 final class TrackerCell: UICollectionViewCell {
     
+    // MARK: - Properties
+    
     static let identifier: String = "TrackerCell"
+    private var completedDaysCount: Int = 0
+    private var currentDate: Date?
+    
+    // MARK: - UI Elements
     
     private lazy var cardView: UIView = {
         let view = UIView()
@@ -51,14 +57,26 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
+    private lazy var counterLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    
     private var tracker: Tracker?
     private var isCompleted: Bool = false
     private var completionHandler: (() -> Void)?
+    
+    // MARK: - Lifecycle
     
     override func layoutSubviews() {
         super.layoutSubviews()
         setupViews()
     }
+    
+    // MARK: - Setup Methods
     
     private func setupViews() {
         contentView.addSubview(cardView)
@@ -66,6 +84,7 @@ final class TrackerCell: UICollectionViewCell {
         emojiView.addSubview(emojiLabel)
         cardView.addSubview(titleLabel)
         contentView.addSubview(completeButton)
+        contentView.addSubview(counterLabel)
         
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -88,15 +107,43 @@ final class TrackerCell: UICollectionViewCell {
             completeButton.centerYAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
             completeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             completeButton.heightAnchor.constraint(equalToConstant: 34),
-            completeButton.widthAnchor.constraint(equalToConstant: 34)
+            completeButton.widthAnchor.constraint(equalToConstant: 34),
+            
+            counterLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
+            counterLabel.trailingAnchor.constraint(equalTo: completeButton.leadingAnchor, constant: -8)
         ])
     }
     
-    func configure(with tracker: Tracker) {
-        titleLabel.text = tracker.title
-        emojiLabel.text = tracker.emoji
-        cardView.backgroundColor = tracker.color
+    // MARK: - Actions
+    
+    @objc private func completeButtonTapped() {
+        guard let tracker = self.tracker,
+              let currentDate = self.currentDate else { return }
+        
+        if isFutureDate(currentDate) {
+            print("\(#file):\(#line)] \(#function) Нельзя отметить трекер на будущую дату")
+            return
+        }
+        
+        isCompleted.toggle()
+        setCompletedState(isCompleted)
+        completedDaysCount += isCompleted ? 1 : -1
+        counterLabel.text = "\(completedDaysCount) дней"
+        completionHandler?()
+        
+        print("\(#file):\(#line)] \(#function) Изменено состояние трекера: \(tracker.title), выполнено: \(isCompleted)")
     }
+    
+    // MARK: - Private Methods
+    
+    private func isFutureDate(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selectedDate = calendar.startOfDay(for: date)
+        return selectedDate > today
+    }
+    
+    // MARK: - Public Methods
     
     func setCompletedState(_ isCompleted: Bool) {
         completeButton.setImage(
@@ -116,11 +163,20 @@ final class TrackerCell: UICollectionViewCell {
         setCompletedState(isCompleted)
     }
     
-    @objc private func completeButtonTapped() {
-        completionHandler?()
+    func configure(with tracker: Tracker, currentDate: Date, completedDaysCount: Int, isCompleted: Bool) {
+        self.tracker = tracker
+        self.currentDate = currentDate
+        self.completedDaysCount = completedDaysCount
+        self.isCompleted = isCompleted
         
-        isCompleted.toggle()
+        titleLabel.text = tracker.title
+        emojiLabel.text = tracker.emoji
+        cardView.backgroundColor = tracker.color
+        counterLabel.text = "\(completedDaysCount) дней"
         setCompletedState(isCompleted)
-        completionHandler?()
+        
+        print("\(#file):\(#line)] \(#function) Настройка ячейки трекера: \(tracker.title), дата: \(currentDate)")
     }
 }
+
+
