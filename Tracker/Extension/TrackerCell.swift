@@ -123,14 +123,6 @@ final class TrackerCell: UICollectionViewCell {
             return
         }
         
-        UIView.animate(withDuration: 0.3) { [weak self] in
-            self?.completeButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-        } completion: { [weak self] _ in
-            UIView.animate(withDuration: 0.1) {
-                self?.completeButton.transform = .identity
-            }
-        }
-        
         isCompleted.toggle()
         setCompletedState(isCompleted)
         completedDaysCount += isCompleted ? 1 : -1

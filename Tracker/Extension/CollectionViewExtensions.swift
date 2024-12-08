@@ -18,29 +18,38 @@ extension TrackersViewController: UICollectionViewDataSource {
       }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: TrackerCell.identifier,
-                for: indexPath
-            ) as? TrackerCell else {
-                print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
-                return UICollectionViewCell()
-            }
-            
-            let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
-            let isCompleted = isTrackerCompleted(tracker, date: currentDate)
-            let completedCount = countCompletedDays(for: tracker)
-            
-            cell.configure(
-                with: tracker,
-                currentDate: currentDate,
-                completedDaysCount: completedCount,
-                isCompleted: isCompleted
-            )
-            
-            print("\(#file):\(#line)] \(#function) Настройка ячейки для трекера: \(tracker.title), дата: \(currentDate)")
-            
-            return cell
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: TrackerCell.identifier,
+            for: indexPath
+        ) as? TrackerCell else {
+            print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
+            return UICollectionViewCell()
         }
+        
+        let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
+        let isCompleted = isTrackerCompleted(tracker, date: currentDate)
+        let completedCount = countCompletedDays(for: tracker)
+        
+        cell.configure(
+            with: tracker,
+            currentDate: currentDate,
+            completedDaysCount: completedCount,
+            isCompleted: isCompleted
+        )
+        
+        cell.configureCompletionHandler(tracker: tracker, isCompleted: isCompleted) { [weak self] in
+            guard let self = self else { return }
+            if isCompleted {
+                self.removeTrackerRecord(tracker, date: self.currentDate)
+            } else {
+                self.addTrackerRecord(tracker, date: self.currentDate)
+            }
+        }
+        
+        print("\(#file):\(#line)] \(#function) Настройка ячейки для трекера: \(tracker.title), дата: \(currentDate)")
+        
+        return cell
+    }
     
     func toggleTracker(_ tracker: Tracker) {
         let calendar = Calendar.current

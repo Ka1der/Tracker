@@ -8,7 +8,7 @@
 import UIKit
 
 final class TrackersViewController: UIViewController  {
-  
+    
     // MARK: - Properties
     
     var filteredCategories: [TrackerCategory] = []
@@ -124,7 +124,7 @@ final class TrackersViewController: UIViewController  {
     }
     
     // MARK: - Setup Methods
-
+    
     private func setupViews() {
         view.backgroundColor = .systemBackground
         view.addSubview(navigationBar)
@@ -198,7 +198,7 @@ final class TrackersViewController: UIViewController  {
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
         print("\(#file):\(#line)] \(#function) Выбрана дата: \(sender.date)")
-
+        
         filteredCategories = filterTrackersByDate(currentDate)
         
         DispatchQueue.main.async {
