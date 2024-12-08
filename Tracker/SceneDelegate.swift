@@ -16,7 +16,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let windowScene = scene as! UIWindowScene
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = OnboardingViewController()
+        window?.rootViewController = TabBarController()
+//        window?.rootViewController = OnboardingViewController()
         window?.makeKeyAndVisible()
     }
     

@@ -14,6 +14,9 @@ final class TrackerCell: UICollectionViewCell {
     static let identifier: String = "TrackerCell"
     private var completedDaysCount: Int = 0
     private var currentDate: Date?
+    private var tracker: Tracker?
+    private var isCompleted: Bool = false
+    private var completionHandler: (() -> Void)?
     
     // MARK: - UI Elements
     
@@ -50,7 +53,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var completeButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "plus.circle"), for: .normal)
+        button.setImage(UIImage(named: "plusButtonCell"), for: .normal)
         button.tintColor = .white
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
@@ -63,11 +66,6 @@ final class TrackerCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    
-    private var tracker: Tracker?
-    private var isCompleted: Bool = false
-    private var completionHandler: (() -> Void)?
     
     // MARK: - Lifecycle
     
@@ -104,7 +102,7 @@ final class TrackerCell: UICollectionViewCell {
             titleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
             
-            completeButton.centerYAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            completeButton.topAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 8),
             completeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             completeButton.heightAnchor.constraint(equalToConstant: 34),
             completeButton.widthAnchor.constraint(equalToConstant: 34),
@@ -123,6 +121,14 @@ final class TrackerCell: UICollectionViewCell {
         if isFutureDate(currentDate) {
             print("\(#file):\(#line)] \(#function) Нельзя отметить трекер на будущую дату")
             return
+        }
+        
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            self?.completeButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        } completion: { [weak self] _ in
+            UIView.animate(withDuration: 0.1) {
+                self?.completeButton.transform = .identity
+            }
         }
         
         isCompleted.toggle()
@@ -146,10 +152,13 @@ final class TrackerCell: UICollectionViewCell {
     // MARK: - Public Methods
     
     func setCompletedState(_ isCompleted: Bool) {
-        completeButton.setImage(
-            UIImage(systemName: isCompleted ? "checkmark.circle.fill" : "plus.circle"),
-            for: .normal
-        )
+        if isCompleted {
+            completeButton.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+        } else {
+            completeButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        }
+        
+        print("\(#file):\(#line)] \(#function) Обновлено состояние кнопки: \(isCompleted ? "выполнено" : "не выполнено")")
     }
     
     func configureCompletionHandler(
@@ -172,6 +181,7 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         emojiLabel.text = tracker.emoji
         cardView.backgroundColor = tracker.color
+        completeButton.tintColor = tracker.color
         counterLabel.text = "\(completedDaysCount) дней"
         setCompletedState(isCompleted)
         
