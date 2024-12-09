@@ -18,7 +18,7 @@ struct Tracker {
     let isPinned: Bool
 }
 
-// MARK: - Enums
+// MARK: - WeekDay
 
 enum WeekDay: Int, CaseIterable {
     case monday = 1
@@ -53,3 +53,5 @@ struct TrackerCategory {
     let title: String
     let trackers: [Tracker]
 }
+
+

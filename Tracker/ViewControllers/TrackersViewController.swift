@@ -115,6 +115,7 @@ final class TrackersViewController: UIViewController  {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.isHidden = true
         setupViews()
         setupNavigationBar()
         setupPlaceholder()
@@ -123,44 +124,47 @@ final class TrackersViewController: UIViewController  {
         updatePlaceholderVisibility()
     }
     
+    
     // MARK: - Setup Methods
     
     private func setupViews() {
         view.backgroundColor = .systemBackground
-        view.addSubview(navigationBar)
-        view.addSubview(addButton)
-        view.addSubview(titleLabel)
-        view.addSubview(datePicker)
-        view.addSubview(searchBar)
-        placeholderStack.addArrangedSubview(placeholderImageView)
-        placeholderStack.addArrangedSubview(placeholderLabel)
-        view.addSubview(placeholderStack)
-        view.addSubview(collectionView)
+           
+           navigationBar.addSubview(addButton)
+           navigationBar.addSubview(titleLabel)
+           navigationBar.addSubview(datePicker)
+           navigationBar.addSubview(searchBar)
+           
+           view.addSubview(navigationBar)
+           placeholderStack.addArrangedSubview(placeholderImageView)
+           placeholderStack.addArrangedSubview(placeholderLabel)
+           view.addSubview(placeholderStack)
+           view.addSubview(collectionView)
     }
     
     private func setupNavigationBar() {
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 88),
-            
-            addButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            addButton.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 8),
-            
-            datePicker.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            datePicker.centerYAnchor.constraint(equalTo: addButton.centerYAnchor),
-            datePicker.heightAnchor.constraint(equalToConstant: 34),
-            datePicker.widthAnchor.constraint(equalToConstant: 77),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
-            titleLabel.topAnchor.constraint(equalTo: addButton.bottomAnchor, constant: 1),
-            
-            searchBar.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
-            searchBar.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -16),
-            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7),
-        ])
+
+              navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+              navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+              navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+              navigationBar.heightAnchor.constraint(equalToConstant: 44),
+              
+              addButton.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
+              addButton.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+              
+              datePicker.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -16),
+              datePicker.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+              
+              titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
+              titleLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 1),
+              
+              searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+              searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+              searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7)
+          ])
     }
     
     private func setupPlaceholder() {
