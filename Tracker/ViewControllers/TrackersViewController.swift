@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController  {
+final class TrackersViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -17,14 +17,14 @@ final class TrackersViewController: UIViewController  {
     var currentDate: Date = Date()
     var completedTrackers: [TrackerRecord] = []
     
-    // MARK: - UI Elements
+    private let dateFormatter: DateFormatter = {
+         let formatter = DateFormatter()
+         formatter.dateFormat = "dd.MM.yy"
+         formatter.locale = Locale(identifier: "ru")
+         return formatter
+     }()
     
-    private lazy var navigationBar: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    } ()
+    // MARK: - UI Elements
     
     private lazy var addButton: UIButton = {
         let button = UIButton()
@@ -76,15 +76,25 @@ final class TrackersViewController: UIViewController  {
     }()
     
     private lazy var datePicker: UIDatePicker = {
-        let picker = UIDatePicker()
-        picker.preferredDatePickerStyle = .compact
-        picker.datePickerMode = .date
-        picker.locale = Locale(identifier: "ru_RU")
-        picker.calendar.firstWeekday = 2
-        picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
-        return picker
-    }()
+          let picker = UIDatePicker()
+          if #available(iOS 13.4, *) {
+              picker.preferredDatePickerStyle = .compact
+          }
+          picker.datePickerMode = .date
+          picker.locale = Locale.init(identifier: "ru")
+          picker.calendar = Calendar.init(identifier: .gregorian)
+          picker.calendar.locale = Locale(identifier: "ru")
+        let currentDate = Date()
+          let calendar = Calendar.current
+          picker.minimumDate = calendar.date(byAdding: .year, value: -1, to: currentDate)
+          picker.maximumDate = calendar.date(byAdding: .year, value: 1, to: currentDate)
+          
+          picker.widthAnchor.constraint(equalToConstant: 120).isActive = true
+          picker.translatesAutoresizingMaskIntoConstraints = false
+          picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+          picker.tintColor = .blue
+          return picker
+      }()
     
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -107,66 +117,58 @@ final class TrackersViewController: UIViewController  {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
             withReuseIdentifier: "footer"
         )
-        
         return collectionView
     }()
     
-    // MARK: - Lifecycle
+     // MARK: - Lifecycle
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationController?.navigationBar.isHidden = true
-        setupViews()
-        setupNavigationBar()
-        setupPlaceholder()
-        setupCollectionView()
-        setupDateFormatter()
-        updatePlaceholderVisibility()
-    }
-    
-    
-    // MARK: - Setup Methods
+         super.viewDidLoad()
+         setupViews()
+         setupNavigationBar()
+         setupPlaceholder()
+         setupCollectionView()
+         updatePlaceholderVisibility()
+     }
+     
+     // MARK: - Setup Methods
     
     private func setupViews() {
         view.backgroundColor = .systemBackground
-           
-           navigationBar.addSubview(addButton)
-           navigationBar.addSubview(titleLabel)
-           navigationBar.addSubview(datePicker)
-           navigationBar.addSubview(searchBar)
-           
-           view.addSubview(navigationBar)
-           placeholderStack.addArrangedSubview(placeholderImageView)
-           placeholderStack.addArrangedSubview(placeholderLabel)
-           view.addSubview(placeholderStack)
-           view.addSubview(collectionView)
+        
+        view.addSubview(titleLabel)
+        view.addSubview(searchBar)
+        placeholderStack.addArrangedSubview(placeholderImageView)
+        placeholderStack.addArrangedSubview(placeholderLabel)
+        view.addSubview(placeholderStack)
+        view.addSubview(collectionView)
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            
+            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
     
     private func setupNavigationBar() {
-        navigationBar.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-
-              navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-              navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-              navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-              navigationBar.heightAnchor.constraint(equalToConstant: 44),
-              
-              addButton.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
-              addButton.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
-              
-              datePicker.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -16),
-              datePicker.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
-              
-              titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 16),
-              titleLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 1),
-              
-              searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-              searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-              searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7)
-          ])
+        let addButton = UIButton(frame: CGRect(x: 6, y: 0, width: 42, height: 42))
+        addButton.setImage(UIImage(named: "plusButton"), for: .normal)
+        addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+        let addBarButton = UIBarButtonItem(customView: addButton)
+        let dateBarButton = UIBarButtonItem(customView: datePicker)
+        navigationItem.leftBarButtonItem = addBarButton
+        navigationItem.rightBarButtonItem = dateBarButton
+        print("\(#file):\(#line)] \(#function) Настроен NavigationBar с DatePicker")
     }
-    
+
     private func setupPlaceholder() {
         
         placeholderStack.isHidden = false
@@ -201,14 +203,12 @@ final class TrackersViewController: UIViewController  {
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        print("\(#file):\(#line)] \(#function) Выбрана дата: \(sender.date)")
+        let formattedDate = dateFormatter.string(from: sender.date)
+        print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
         
         filteredCategories = filterTrackersByDate(currentDate)
-        
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-            self.updatePlaceholderVisibility()
-        }
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
     }
     
     // MARK: - Private Methods
@@ -227,6 +227,34 @@ final class TrackersViewController: UIViewController  {
         let today = calendar.startOfDay(for: Date())
         let checkDate = calendar.startOfDay(for: date)
         return checkDate > today
+    }
+    
+    private func setupDatePickerFormat() {
+           datePicker.locale = Locale(identifier: "ru_RU")
+           var calendar = Calendar.current
+           calendar.locale = Locale(identifier: "ru_RU")
+           datePicker.calendar = calendar
+       }
+    
+    private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
+        
+        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
+        
+        let filteredCategories = categories.compactMap { category in
+            let filteredTrackers = category.trackers.filter { tracker in
+                let shouldDisplay = tracker.scheldue.contains(adjustedWeekday)
+                print("\(#file):\(#line)] \(#function) Трекер '\(tracker.title)': расписание [\(tracker.scheldue.map { $0.shortName }.joined(separator: ", "))], отображать: \(shouldDisplay)")
+                return shouldDisplay
+            }
+            
+            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+        }
+        
+        print("\(#file):\(#line)] \(#function) Найдено категорий после фильтрации: \(filteredCategories.count)")
+        return filteredCategories
     }
     
     // MARK: - TrackerManagement
@@ -305,30 +333,18 @@ extension TrackersViewController: UICollectionViewDelegate {
         print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
     }
     
-    private func setupDateFormatter() {
-        
-    }
-    
-    private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
-        
-        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
-        
-        let filteredCategories = categories.compactMap { category in
-            let filteredTrackers = category.trackers.filter { tracker in
-                let shouldDisplay = tracker.scheldue.contains(adjustedWeekday)
-                print("\(#file):\(#line)] \(#function) Трекер '\(tracker.title)': расписание [\(tracker.scheldue.map { $0.shortName }.joined(separator: ", "))], отображать: \(shouldDisplay)")
-                return shouldDisplay
-            }
-            
-            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
-        }
-        
-        print("\(#file):\(#line)] \(#function) Найдено категорий после фильтрации: \(filteredCategories.count)")
-        return filteredCategories
-    }
+//    private func setupDateFormatter() {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "dd.MM.yy"
+//        formatter.locale = Locale(identifier: "ru_RU")
+//        
+//        // Применяем формат к DatePicker
+//        if let datePickerClass = NSClassFromString("UIDatePicker") as? UIDatePicker.Type {
+//            datePicker.setValue("dd.MM.yy", forKey: "dateFormat")
+//        }
+//        
+//        print("\(#file):\(#line)] \(#function) Установлен формат даты: dd.MM.yy")
+//    }
     
     func countCompletedDays(for tracker: Tracker) -> Int {
         completedTrackers.filter { $0.id == tracker.id }.count
