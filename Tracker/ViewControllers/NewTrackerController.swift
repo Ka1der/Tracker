@@ -88,6 +88,9 @@ final class NewTrackerController: UIViewController {
     }
     
     @objc private func irregularEventButtonTapped() {
-        print("\(#file):\(#line)] \(#function) Нажата кнопка Нерегулярное событие")
+        let irregularEventVC = NewIrregularEventController()
+        irregularEventVC.modalPresentationStyle = .automatic
+        print("\(#file):\(#line)] \(#function) Переход к созданию нерегулярного события")
+        present(irregularEventVC, animated: true)
     }
 }
