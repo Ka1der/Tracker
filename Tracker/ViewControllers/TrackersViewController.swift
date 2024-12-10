@@ -46,6 +46,8 @@ final class TrackersViewController: UIViewController {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Поиск"
         searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.backgroundImage = UIImage()
+        searchBar.backgroundColor = .clear
         return searchBar
     }()
     
@@ -76,25 +78,21 @@ final class TrackersViewController: UIViewController {
     }()
     
     private lazy var datePicker: UIDatePicker = {
-          let picker = UIDatePicker()
-          if #available(iOS 13.4, *) {
-              picker.preferredDatePickerStyle = .compact
-          }
-          picker.datePickerMode = .date
-          picker.locale = Locale.init(identifier: "ru")
-          picker.calendar = Calendar.init(identifier: .gregorian)
-          picker.calendar.locale = Locale(identifier: "ru")
-        let currentDate = Date()
-          let calendar = Calendar.current
-          picker.minimumDate = calendar.date(byAdding: .year, value: -1, to: currentDate)
-          picker.maximumDate = calendar.date(byAdding: .year, value: 1, to: currentDate)
-          
-          picker.widthAnchor.constraint(equalToConstant: 120).isActive = true
-          picker.translatesAutoresizingMaskIntoConstraints = false
-          picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
-          picker.tintColor = .blue
-          return picker
-      }()
+        let picker = UIDatePicker()
+        picker.preferredDatePickerStyle = .compact
+        picker.datePickerMode = .date
+        picker.locale = Locale(identifier: "ru_RU")
+        picker.calendar.firstWeekday = 2
+        picker.widthAnchor.constraint(equalToConstant: 120).isActive = true
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+        picker.tintColor = .blue
+ 
+        if let textLabel = picker.subviews.first?.subviews.first as? UILabel {
+            textLabel.font = .systemFont(ofSize: 17)
+        }
+        return picker
+    }()
     
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -332,19 +330,6 @@ extension TrackersViewController: UICollectionViewDelegate {
         selectedCell = nil
         print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
     }
-    
-//    private func setupDateFormatter() {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "dd.MM.yy"
-//        formatter.locale = Locale(identifier: "ru_RU")
-//        
-//        // Применяем формат к DatePicker
-//        if let datePickerClass = NSClassFromString("UIDatePicker") as? UIDatePicker.Type {
-//            datePicker.setValue("dd.MM.yy", forKey: "dateFormat")
-//        }
-//        
-//        print("\(#file):\(#line)] \(#function) Установлен формат даты: dd.MM.yy")
-//    }
     
     func countCompletedDays(for tracker: Tracker) -> Int {
         completedTrackers.filter { $0.id == tracker.id }.count
