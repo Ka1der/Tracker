@@ -31,6 +31,15 @@ final class NewTrackerController: UIViewController {
         return button
     }()
     
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Создание трекера"
+        label.font = UIFont(name: "SFPro-Medium", size: 16)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     private lazy var backgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
@@ -41,6 +50,7 @@ final class NewTrackerController: UIViewController {
     private func setupViews() {
         view.addSubview(backgroundView)
         view.addSubview(habitButton)
+        view.addSubview(titleLabel)
         view.addSubview(irregularEventButton)
         
         NSLayoutConstraint.activate([
@@ -53,6 +63,10 @@ final class NewTrackerController: UIViewController {
             irregularEventButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             irregularEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             irregularEventButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
             
             backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
