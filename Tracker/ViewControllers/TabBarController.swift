@@ -19,18 +19,24 @@ final class TabBarController: UITabBarController {
     
     func tabBarController() {
         let trackers = UINavigationController(rootViewController: trackerNavigationController)
+        
+        let trackerText = [
+            NSAttributedString.Key.font: UIFont(name: ".SFProText-Regular", size: 10)
+        ]
         trackers.tabBarItem = UITabBarItem(
-            title: "",
+            title: "Трекеры",
             image: UIImage(named: "Trackers"),
             selectedImage: nil
         )
+        trackers.tabBarItem.setTitleTextAttributes(trackerText as [NSAttributedString.Key : Any], for: .normal)
         
         let statistic = UIViewController()
         statistic.tabBarItem = UITabBarItem(
-            title: "",
+            title: "Статистика",
             image: UIImage(named: "Statistic"),
             selectedImage: nil
         )
+        statistic.tabBarItem.setTitleTextAttributes(trackerText as [NSAttributedString.Key : Any], for: .normal)
         
         viewControllers = [trackers, statistic]
         
