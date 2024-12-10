@@ -9,6 +9,8 @@ import UIKit
 
 final class NewIrregularEventController: UIViewController {
     
+    // MARK: - Properties
+    
     private let colors: [UIColor] = [
         .systemRed,
         .systemOrange,
@@ -200,6 +202,7 @@ final class NewIrregularEventController: UIViewController {
             createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 56) / 2),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+        
         
         print("\(#file):\(#line)] \(#function) Настроен интерфейс IrregularEventViewController")
     }
