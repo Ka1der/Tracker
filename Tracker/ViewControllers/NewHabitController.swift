@@ -39,6 +39,7 @@ final class NewHabitController: UIViewController {
                           "😇", "😡", "🥶", "🤔", "🌟", "🍔",
                           "🥦", "🏓", "🥇", "🎸", "🌴", "😭"]
     
+    private var isFormValid: Bool = false
     
     // MARK: - UI Elements
     
@@ -186,6 +187,7 @@ final class NewHabitController: UIViewController {
         view.backgroundColor = .white
         setupViews()
         view.addGestureRecognizer(tapGesture)
+        nameTextField.delegate = self
     }
     
     override func viewDidLayoutSubviews() {
@@ -281,6 +283,31 @@ final class NewHabitController: UIViewController {
         }
     }
     
+    // MARK: - Private Func
+
+    private func updateCreateButtonState() {
+        guard let text = nameTextField.text else {
+            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+            createButton.isEnabled = false
+            print("\(#file):\(#line)] \(#function) TextField.text == nil")
+            return
+        }
+        
+        let hasText = !text.isEmpty
+        let hasSchedule = !schedule.isEmpty
+        isFormValid = hasText && hasSchedule
+        
+        print("\(#file):\(#line)] \(#function) Состояние формы - текст: \(hasText), расписание: \(hasSchedule)")
+        
+        if isFormValid {
+            createButton.backgroundColor = .blackYPBlack
+            createButton.isEnabled = true
+        } else {
+            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+            createButton.isEnabled = false
+        }
+    }
+    
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
@@ -295,9 +322,9 @@ final class NewHabitController: UIViewController {
         }
         
         guard !schedule.isEmpty else {
-               print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
-               return
-           }
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
+            return
+        }
         
         let newTracker = Tracker(
             id: UUID(),
@@ -327,6 +354,7 @@ final class NewHabitController: UIViewController {
     }
 }
 
+
 // MARK: - NewScheduleControllerDelegate
 
 extension NewHabitController: NewScheduleControllerDelegate {
@@ -334,7 +362,6 @@ extension NewHabitController: NewScheduleControllerDelegate {
         self.schedule = schedule
         print("\(#file):\(#line)] \(#function) Получено расписание: \(schedule)")
         
-        // Создаем атрибутный текст
         let title = "Расписание\n"
         let weekDays = schedule.map { $0.shortName }.joined(separator: ", ")
         
@@ -347,7 +374,6 @@ extension NewHabitController: NewScheduleControllerDelegate {
             range: NSRange(location: 0, length: title.count - 1)
         )
         
-        // Добавляем дни, только если они выбраны
         if !schedule.isEmpty {
             let daysString = NSAttributedString(
                 string: weekDays,
@@ -360,6 +386,7 @@ extension NewHabitController: NewScheduleControllerDelegate {
         }
         
         scheduleButton.setAttributedTitle(attributedString, for: .normal)
+        updateCreateButtonState()
     }
 }
 
@@ -469,13 +496,31 @@ final class HabitColorCell: UICollectionViewCell {
     }
 }
 
-// MARK: -Скрытие клаиватуры
+// MARK: - Скрытие клаиватуры
 
 extension NewHabitController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+          updateCreateButtonState()
+          print("\(#file):\(#line)] \(#function) Начато редактирование текста")
+      }
+      
+      func textFieldDidChangeSelection(_ textField: UITextField) {
+          updateCreateButtonState()
+          print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
+      }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
         
         return true
     }
-}
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        DispatchQueue.main.async {
+            self.updateCreateButtonState()
+        }
+        return true
+       }
+   }
