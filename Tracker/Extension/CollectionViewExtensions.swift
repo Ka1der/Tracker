@@ -52,16 +52,12 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func toggleTracker(_ tracker: Tracker) {
-        let calendar = Calendar.current
-        let trackerID = tracker.id
+        let completedID = CompletedTrackerID(id: tracker.id, date: currentDate)
         
-        if let index = completedTrackers.firstIndex(where: { record in
-            record.id == trackerID && calendar.isDate(record.date, inSameDayAs: currentDate)
-        }) {
-            completedTrackers.remove(at: index)
+        if completedTrackers.contains(completedID) {
+            completedTrackers.remove(completedID)
         } else {
-            let record = TrackerRecord(id: trackerID, date: currentDate)
-            completedTrackers.append(record)
+            completedTrackers.insert(completedID)
         }
         
         collectionView.reloadData()

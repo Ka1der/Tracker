@@ -15,7 +15,7 @@ final class TrackersViewController: UIViewController {
     private var selectedCell: TrackerCell?
     var categories: [TrackerCategory] = []
     var currentDate: Date = Date()
-    var completedTrackers: [TrackerRecord] = []
+    var completedTrackers: Set<CompletedTrackerID> = []
     
     private let dateFormatter: DateFormatter = {
          let formatter = DateFormatter()
@@ -257,22 +257,41 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - TrackerManagement
     
-    func addTrackerRecord(_ tracker: Tracker, date: Date) {
-        let record = TrackerRecord(id: tracker.id, date: date)
-        completedTrackers.append(record)
-        collectionView.reloadData()
-    }
-    
-    func removeTrackerRecord(_ tracker: Tracker, date: Date) {
-        completedTrackers.removeAll { record in
-            record.id == tracker.id && Calendar.current.isDate(record.date, inSameDayAs: date)
-        }
-        collectionView.reloadData()
-    }
-    
     func isTrackerCompleted(_ tracker: Tracker, date: Date) -> Bool {
-        completedTrackers.contains { record in
-            record.id == tracker.id && Calendar.current.isDate(record.date, inSameDayAs: date)
+        let completedID = CompletedTrackerID(id: tracker.id, date: date)
+        return completedTrackers.contains(completedID)
+    }
+
+    func addTrackerRecord(_ tracker: Tracker, date: Date) {
+        let completedID = CompletedTrackerID(id: tracker.id, date: date)
+        completedTrackers.insert(completedID)
+        print("\(#file):\(#line)] \(#function) Добавлен трекер: \(tracker.title) на дату: \(date)")
+        collectionView.reloadData()
+    }
+
+    func removeTrackerRecord(_ tracker: Tracker, date: Date) {
+        let completedID = CompletedTrackerID(id: tracker.id, date: date)
+        completedTrackers.remove(completedID)
+        print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title) с даты: \(date)")
+        collectionView.reloadData()
+    }
+
+    func countCompletedDays(for tracker: Tracker) -> Int {
+        completedTrackers.filter { $0.id == tracker.id }.count
+    }
+    
+    struct CompletedTrackerID: Hashable {
+        let id: UUID
+        let date: Date
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+            hasher.combine(Calendar.current.startOfDay(for: date))
+        }
+        
+        static func == (lhs: CompletedTrackerID, rhs: CompletedTrackerID) -> Bool {
+            return lhs.id == rhs.id &&
+                   Calendar.current.isDate(lhs.date, inSameDayAs: rhs.date)
         }
     }
 }
@@ -329,10 +348,6 @@ extension TrackersViewController: UICollectionViewDelegate {
         }
         selectedCell = nil
         print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
-    }
-    
-    func countCompletedDays(for tracker: Tracker) -> Int {
-        completedTrackers.filter { $0.id == tracker.id }.count
     }
 }
 
@@ -392,9 +407,9 @@ extension TrackersViewController {
         }
         
         let tracker = categories[categoryIndex].trackers[trackerIndex]
-        completedTrackers.removeAll { $0.id == tracker.id }
-        var updatedTrackers = categories[categoryIndex].trackers
-        updatedTrackers.remove(at: trackerIndex)
+            completedTrackers = completedTrackers.filter { $0.id != tracker.id }
+            var updatedTrackers = categories[categoryIndex].trackers
+            updatedTrackers.remove(at: trackerIndex)
         
         if updatedTrackers.isEmpty {
             categories.remove(at: categoryIndex)
