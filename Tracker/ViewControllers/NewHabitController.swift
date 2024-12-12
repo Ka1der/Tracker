@@ -13,6 +13,7 @@ final class NewHabitController: UIViewController {
     
     weak var delegate: NewHabitControllerDelegate?
     private var schedule: Set<WeekDay> = []
+    private var selectedCategory: String?
     
     private let colors: [UIColor] = [
         .systemRed,
@@ -66,11 +67,26 @@ final class NewHabitController: UIViewController {
     
     private lazy var categoryButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Категория", for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        
+        let attributedString = NSMutableAttributedString(
+            string: "Категория",
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ]
+        )
+        
+        button.setAttributedTitle(attributedString, for: .normal)
+        button.contentHorizontalAlignment = .left
+        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
+        
+        let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
+        button.setImage(chevronImage, for: .normal)
+        button.tintColor = .gray
+        button.titleLabel?.numberOfLines = 0
+        
         return button
     }()
     
@@ -189,6 +205,8 @@ final class NewHabitController: UIViewController {
         setupViews()
         view.addGestureRecognizer(tapGesture)
         nameTextField.delegate = self
+        categoryButton.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -285,7 +303,7 @@ final class NewHabitController: UIViewController {
     }
     
     // MARK: - Private Func
-
+    
     private func updateCreateButtonState() {
         guard let text = nameTextField.text else {
             createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
@@ -336,9 +354,10 @@ final class NewHabitController: UIViewController {
             isPinned: false
         )
         
-        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', расписание - [\(schedule.map { $0.shortName }.joined(separator: ", "))]")
+        let category = selectedCategory ?? "Важное"  // Используем выбранную категорию или дефолтную
+        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
         
-        delegate?.didCreateTracker(newTracker, category: "Новая категория")
+        delegate?.didCreateTracker(newTracker, category: category)
         dismiss(animated: true)
     }
     
@@ -356,12 +375,14 @@ final class NewHabitController: UIViewController {
     
     @objc private func categoryButtonTapped() {
         let categoryController = NewCategoryController()
-        categoryController.modalPresentationStyle = .automatic
+        categoryController.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryController)
+        navigationController.modalPresentationStyle = .automatic
         print("\(#file):\(#line)] \(#function) Переход к выбору категории")
-        present(categoryController, animated: true)
+        present(navigationController, animated: true)
     }
+    
 }
-
 
 // MARK: - NewScheduleControllerDelegate
 
@@ -532,3 +553,31 @@ extension NewHabitController: UITextFieldDelegate {
         return true
        }
    }
+
+extension NewHabitController: NewCategoryControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        selectedCategory = category
+        let title = "Категория\n"
+        let attributedString = NSMutableAttributedString(string: title)
+        attributedString.addAttributes(
+            [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ],
+            range: NSRange(location: 0, length: title.count - 1)
+        )
+
+        let categoryString = NSAttributedString(
+            string: category,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor(named: "textGray") ?? .gray
+            ]
+        )
+        attributedString.append(categoryString)
+
+        categoryButton.setAttributedTitle(attributedString, for: .normal)
+        print("\(#file):\(#line)] \(#function) Установлена категория: \(category)")
+        updateCreateButtonState()
+    }
+}

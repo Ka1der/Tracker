@@ -280,6 +280,18 @@ final class TrackersViewController: UIViewController {
         completedTrackers.filter { $0.id == tracker.id }.count
     }
     
+    func createCategory(withTitle title: String) {
+        let newCategory = TrackerCategory(title: title, trackers: [])
+        categories.append(newCategory)
+        filteredCategories = filterTrackersByDate(currentDate)
+        
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+            self.updatePlaceholderVisibility()
+            print("\(#file):\(#line)] \(#function) Добавлена новая категория: \(title)")
+        }
+    }
+    
     struct CompletedTrackerID: Hashable {
         let id: UUID
         let date: Date
