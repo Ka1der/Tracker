@@ -71,14 +71,23 @@ final class NewHabitController: UIViewController {
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         return button
     }()
-
+    
     private lazy var scheduleButton: UIButton = {
         let button = UIButton()
         button.setTitle("Расписание", for: .normal)
         button.setTitleColor(.black, for: .normal)
+        button.contentHorizontalAlignment = .left
+        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
+        button.titleLabel?.numberOfLines = 0
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         button.addTarget(self, action: #selector(scheduleButtonTapped), for: .touchUpInside)
+        
+        // Добавляем иконку шеврона справа
+        let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
+        button.setImage(chevronImage, for: .normal)
+        button.tintColor = .gray
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
+        
         return button
     }()
     
@@ -201,7 +210,7 @@ final class NewHabitController: UIViewController {
         //        view.addSubview(colorCollectionView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
-
+        
         buttonsContainerView.addSubview(categoryButton)
         buttonsContainerView.addSubview(separatorView)
         buttonsContainerView.addSubview(scheduleButton)
@@ -263,16 +272,16 @@ final class NewHabitController: UIViewController {
         ])
         
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
-          [categoryButton, scheduleButton].forEach { button in
-              button.setImage(chevronImage, for: .normal)
-              button.tintColor = .gray
-              button.contentHorizontalAlignment = .left
-              button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-              button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
-              button.imageView?.contentMode = .right
-              button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
-          }
-       }
+        [categoryButton, scheduleButton].forEach { button in
+            button.setImage(chevronImage, for: .normal)
+            button.tintColor = .gray
+            button.contentHorizontalAlignment = .left
+            button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+            button.imageView?.contentMode = .right
+            button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
+        }
+    }
     
     // MARK: - Actions
     
@@ -322,8 +331,32 @@ extension NewHabitController: NewScheduleControllerDelegate {
         self.schedule = schedule
         print("\(#file):\(#line)] \(#function) Получено расписание: \(schedule)")
         
+        // Создаем атрибутный текст
+        let title = "Расписание\n"
         let weekDays = schedule.map { $0.shortName }.joined(separator: ", ")
-        scheduleButton.setTitle(schedule.isEmpty ? "Расписание" : weekDays, for: .normal)
+        
+        let attributedString = NSMutableAttributedString(string: title)
+        attributedString.addAttributes(
+            [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ],
+            range: NSRange(location: 0, length: title.count - 1) // Вычитаем 1, чтобы не включать \n
+        )
+        
+        // Добавляем дни, только если они выбраны
+        if !schedule.isEmpty {
+            let daysString = NSAttributedString(
+                string: weekDays,
+                attributes: [
+                    .font: UIFont.systemFont(ofSize: 17),
+                    .foregroundColor: UIColor(named: "textGray") ?? .gray
+                ]
+            )
+            attributedString.append(daysString)
+        }
+        
+        scheduleButton.setAttributedTitle(attributedString, for: .normal)
     }
 }
 
@@ -439,6 +472,7 @@ extension NewHabitController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
+        
         return true
     }
 }
