@@ -346,7 +346,7 @@ extension NewHabitController: NewScheduleControllerDelegate {
                 .font: UIFont.systemFont(ofSize: 17),
                 .foregroundColor: UIColor.black
             ],
-            range: NSRange(location: 0, length: title.count - 1) // Вычитаем 1, чтобы не включать \n
+            range: NSRange(location: 0, length: title.count - 1)
         )
         
         // Добавляем дни, только если они выбраны
