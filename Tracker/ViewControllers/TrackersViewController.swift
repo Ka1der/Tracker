@@ -37,7 +37,7 @@ final class TrackersViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
-        label.font = UIFont.systemFont(ofSize: 34, weight: .bold)
+        label.font = UIFont(name: "SFPro-Bold", size: 34) ?? UIFont.systemFont(ofSize: 34, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

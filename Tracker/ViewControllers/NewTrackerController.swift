@@ -54,12 +54,12 @@ final class NewTrackerController: UIViewController {
         view.addSubview(irregularEventButton)
         
         NSLayoutConstraint.activate([
-            habitButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 395),
+            habitButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 281),
             habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             habitButton.heightAnchor.constraint(equalToConstant: 60),
             
-            irregularEventButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 471),
+            irregularEventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 16),
             irregularEventButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             irregularEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             irregularEventButton.heightAnchor.constraint(equalToConstant: 60),
