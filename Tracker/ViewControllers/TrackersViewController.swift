@@ -340,20 +340,24 @@ extension TrackersViewController: UICollectionViewDelegate {
 
 extension TrackersViewController: NewHabitControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, category: String) {
+        var newCategories = categories
+        
         if let index = categories.firstIndex(where: { $0.title == category }) {
-            var updatedCategory = categories[index]
-            var updatedTrackers = updatedCategory.trackers
-            updatedTrackers.append(tracker)
-            categories[index] = TrackerCategory(title: category, trackers: updatedTrackers)
+            let existingCategory = categories[index]
+            let newTrackers = existingCategory.trackers + [tracker]
+            let updatedCategory = TrackerCategory(title: category, trackers: newTrackers)
+            newCategories[index] = updatedCategory
         } else {
-            categories.append(TrackerCategory(title: category, trackers: [tracker]))
+            let newCategory = TrackerCategory(title: category, trackers: [tracker])
+            newCategories.append(newCategory)
         }
+        categories = newCategories
         filteredCategories = filterTrackersByDate(currentDate)
         
         DispatchQueue.main.async {
             self.collectionView.reloadData()
             self.updatePlaceholderVisibility()
-            print("\(#file):\(#line)] \(#function) Трекер добавлен. Всего категорий: \(self.categories.count), Отфильтрованных: \(self.filteredCategories.count)")
+            print("\(#file):\(#line)] \(#function) Трекер добавлен в новый массив категорий. Всего категорий: \(self.categories.count)")
         }
     }
 }

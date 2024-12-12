@@ -70,6 +70,7 @@ final class NewHabitController: UIViewController {
         button.setTitleColor(.black, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -351,6 +352,13 @@ final class NewHabitController: UIViewController {
     @objc private func hideKeyboard() {
         view.endEditing(true)
         print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
+    }
+    
+    @objc private func categoryButtonTapped() {
+        let categoryController = NewCategoryController()
+        categoryController.modalPresentationStyle = .automatic
+        print("\(#file):\(#line)] \(#function) Переход к выбору категории")
+        present(categoryController, animated: true)
     }
 }
 
