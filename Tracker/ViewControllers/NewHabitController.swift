@@ -54,7 +54,7 @@ final class NewHabitController: UIViewController {
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
-        textField.backgroundColor = .systemGray6
+        textField.backgroundColor = UIColor(named: "backgroundGray")
         textField.layer.cornerRadius = 16
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftViewMode = .always
@@ -81,8 +81,6 @@ final class NewHabitController: UIViewController {
         button.titleLabel?.numberOfLines = 0
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(scheduleButtonTapped), for: .touchUpInside)
-        
-        // Добавляем иконку шеврона справа
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
         button.tintColor = .gray
@@ -108,7 +106,7 @@ final class NewHabitController: UIViewController {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .gray
+        button.backgroundColor = UIColor(named: "backgroundButtonColor")
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
@@ -170,7 +168,7 @@ final class NewHabitController: UIViewController {
     
     private lazy var buttonsContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray6
+        view.backgroundColor = UIColor(named: "backgroundGray")
         view.layer.cornerRadius = 16
         view.translatesAutoresizingMaskIntoConstraints = false
         return view

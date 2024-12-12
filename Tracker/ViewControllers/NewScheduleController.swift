@@ -103,7 +103,7 @@ final class NewScheduleController: UIViewController {
         toggle.translatesAutoresizingMaskIntoConstraints = false
         
         let separator = UIView()
-        separator.backgroundColor = .systemGray5
+        separator.backgroundColor = .systemGray4
         separator.translatesAutoresizingMaskIntoConstraints = false
         
         container.addSubview(label)
