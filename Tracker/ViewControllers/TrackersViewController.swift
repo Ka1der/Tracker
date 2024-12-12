@@ -380,18 +380,20 @@ extension TrackersViewController: NewHabitControllerDelegate {
 extension TrackersViewController {
     
     func addTracker(_ tracker: Tracker, to categoryTitle: String) {
+        var newCategories = categories
+        
         if let categoryIndex = categories.firstIndex(where: { $0.title == categoryTitle }) {
-            var updatedTrackers = categories[categoryIndex].trackers
-            updatedTrackers.append(tracker)
-            categories[categoryIndex] = TrackerCategory(title: categoryTitle, trackers: updatedTrackers)
+            let existingCategory = categories[categoryIndex]
+            let newTrackers = existingCategory.trackers + [tracker]
+            let updatedCategory = TrackerCategory(title: categoryTitle, trackers: newTrackers)
+            newCategories[categoryIndex] = updatedCategory
             print("\(#file):\(#line)] \(#function) Добавлен трекер \(tracker.title) в категорию \(categoryTitle)")
         } else {
             let newCategory = TrackerCategory(title: categoryTitle, trackers: [tracker])
-            categories.append(newCategory)
-            
+            newCategories.append(newCategory)
             print("\(#file):\(#line)] \(#function) Создана новая категория \(categoryTitle) с трекером \(tracker.title)")
         }
-        
+        categories = newCategories
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
