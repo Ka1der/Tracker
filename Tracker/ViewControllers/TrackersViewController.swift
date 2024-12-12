@@ -70,7 +70,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будеем отлеживать?"
+        label.text = "Что будем отслеживать?"
         label.textColor = .label
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
