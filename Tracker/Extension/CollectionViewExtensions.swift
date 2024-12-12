@@ -83,18 +83,8 @@ extension TrackersViewController: UICollectionViewDataSource {
             return view
             
         case UICollectionView.elementKindSectionFooter:
-            guard let view = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: "footer",
-                for: indexPath
-            ) as? SupplementaryView else {
-                print("\(#file):\(#line)] \(#function) Ошибка приведения типа footer view")
-                return UICollectionReusableView()
-            }
-            
-            let completedCount = completedTrackers.count
-            view.titleLabel.text = "Выполнено: \(completedCount)"
-            return view
+    
+            return UICollectionReusableView()
             
         default:
             print("\(#file):\(#line)] \(#function) Запрошен неизвестный тип supplementary view: \(kind)")
@@ -102,12 +92,8 @@ extension TrackersViewController: UICollectionViewDataSource {
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 50)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 50)
+        return .zero
     }
 }
 
