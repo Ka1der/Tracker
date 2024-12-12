@@ -14,6 +14,7 @@ final class NewScheduleController: UIViewController {
     weak var delegate: NewScheduleControllerDelegate?
     
     // MARK: - UI Elements
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Расписание"
@@ -26,7 +27,10 @@ final class NewScheduleController: UIViewController {
     private lazy var stackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 16
+        stack.spacing = 0
+        stack.backgroundColor = UIColor(named: "backgroundGray")
+        stack.layer.cornerRadius = 16
+        stack.clipsToBounds = true
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -52,7 +56,9 @@ final class NewScheduleController: UIViewController {
     
     // MARK: - Setup
     private func setupViews() {
-        [titleLabel, stackView, doneButton].forEach { view.addSubview($0) }
+        view.addSubview(titleLabel)
+        view.addSubview(stackView)
+        view.addSubview(doneButton)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
@@ -82,10 +88,12 @@ final class NewScheduleController: UIViewController {
     
     private func createWeekDayControl(for day: WeekDay) -> UIView {
         let container = UIView()
+        container.backgroundColor = UIColor(named: "backgroundGray")
         container.translatesAutoresizingMaskIntoConstraints = false
         
         let label = UILabel()
         label.text = day.shortName
+        label.font = .systemFont(ofSize: 17)
         label.translatesAutoresizingMaskIntoConstraints = false
         
         let toggle = UISwitch()
@@ -114,6 +122,10 @@ final class NewScheduleController: UIViewController {
             separator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             separator.heightAnchor.constraint(equalToConstant: 0.5)
         ])
+        
+        if day == .sunday {
+               separator.isHidden = true
+           }
         
         return container
     }
