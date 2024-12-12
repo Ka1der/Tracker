@@ -59,6 +59,7 @@ final class NewHabitController: UIViewController {
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftViewMode = .always
         textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.delegate = self
         return textField
     }()
     
@@ -166,12 +167,18 @@ final class NewHabitController: UIViewController {
         return view
     }()
     
+    private lazy var tapGesture: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        return gesture
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupViews()
+        view.addGestureRecognizer(tapGesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -301,6 +308,11 @@ final class NewHabitController: UIViewController {
         print("\(#file):\(#line)] \(#function) Переход к выбору расписания")
         present(scheduleController, animated: true)
     }
+    
+    @objc private func hideKeyboard() {
+        view.endEditing(true)
+        print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
+    }
 }
 
 // MARK: - NewScheduleControllerDelegate
@@ -418,5 +430,15 @@ final class HabitColorCell: UICollectionViewCell {
             contentView.layer.borderColor = colorView.backgroundColor?.withAlphaComponent(0.3).cgColor
             contentView.layer.cornerRadius = 8
         }
+    }
+}
+
+// MARK: -Скрытие клаиватуры
+
+extension NewHabitController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
+        return true
     }
 }
