@@ -52,9 +52,12 @@ final class TrackerCell: UICollectionViewCell {
     }()
     
     private lazy var completeButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "plusButtonCell"), for: .normal)
+        let button = UIButton(type: .system) // Изменяем тип кнопки
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: 34, weight: .medium, scale: .medium)
+        let image = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)
+        button.setImage(image, for: .normal)
         button.tintColor = .white
+        button.contentMode = .scaleAspectFit
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
         return button
@@ -62,7 +65,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = UIFont(name: "SFPro-Bold", size: 12) ?? UIFont.systemFont(ofSize: 12, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -107,9 +110,11 @@ final class TrackerCell: UICollectionViewCell {
             completeButton.heightAnchor.constraint(equalToConstant: 34),
             completeButton.widthAnchor.constraint(equalToConstant: 34),
             
+            counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             counterLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
-            counterLabel.trailingAnchor.constraint(equalTo: completeButton.leadingAnchor, constant: -8)
         ])
+        
+        print("\(#file):\(#line)] \(#function) Размеры кнопки: frame = \(completeButton.frame), bounds = \(completeButton.bounds)")
     }
     
     // MARK: - Actions
@@ -144,11 +149,10 @@ final class TrackerCell: UICollectionViewCell {
     // MARK: - Public Methods
     
     func setCompletedState(_ isCompleted: Bool) {
-        if isCompleted {
-            completeButton.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
-        } else {
-            completeButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
-        }
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: 34, weight: .medium, scale: .medium)
+        let imageName = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
+        let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
+        completeButton.setImage(image, for: .normal)
         
         print("\(#file):\(#line)] \(#function) Обновлено состояние кнопки: \(isCompleted ? "выполнено" : "не выполнено")")
     }
