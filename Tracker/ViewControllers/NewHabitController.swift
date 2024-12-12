@@ -296,6 +296,11 @@ final class NewHabitController: UIViewController {
             return
         }
         
+        guard !schedule.isEmpty else {
+               print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
+               return
+           }
+        
         let newTracker = Tracker(
             id: UUID(),
             title: title,
