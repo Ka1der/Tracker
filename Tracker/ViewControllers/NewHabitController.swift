@@ -62,6 +62,8 @@ final class NewHabitController: UIViewController {
         textField.leftViewMode = .always
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.delegate = self
+        textField.tintColor = .black
+        textField.textColor = .black
         return textField
     }()
     
@@ -377,7 +379,7 @@ final class NewHabitController: UIViewController {
         let categoryController = CategoryListController()
         categoryController.delegate = self
         print("\(#file):\(#line)] \(#function) ОТЛАДКА: Делегат CategoryListController установлен: \(categoryController.delegate != nil)")
-          
+        
         let navigationController = UINavigationController(rootViewController: categoryController)
         navigationController.modalPresentationStyle = .automatic
         print("\(#file):\(#line)] \(#function) Переход к выбору категории")
@@ -580,6 +582,6 @@ extension NewHabitController: CategoryListControllerDelegate {
         print("\(#file):\(#line)] \(#function) Выбрана категория: \(category)")
     }
     func didUpdateCategories(_ categories: [String]) {
-           print("\(#file):\(#line)] \(#function) Получено обновление категорий: \(categories)")
-       }
+        print("\(#file):\(#line)] \(#function) Получено обновление категорий: \(categories)")
+    }
 }
