@@ -12,7 +12,6 @@ final class TrackersViewController: UIViewController {
     // MARK: - Properties
     
     let layoutParams = LayoutParams()
-    
     var filteredCategories: [TrackerCategory] = []
     private var selectedCell: TrackerCell?
     var categories: [TrackerCategory] = []
@@ -20,11 +19,11 @@ final class TrackersViewController: UIViewController {
     var completedTrackers: Set<CompletedTrackerID> = []
     
     private let dateFormatter: DateFormatter = {
-         let formatter = DateFormatter()
-         formatter.dateFormat = "dd.MM.yy"
-         formatter.locale = Locale(identifier: "ru")
-         return formatter
-     }()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yy"
+        formatter.locale = Locale(identifier: "ru")
+        return formatter
+    }()
     
     struct LayoutParams {
         let columnCount: Int = 2
@@ -100,7 +99,7 @@ final class TrackersViewController: UIViewController {
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         picker.tintColor = .blue
- 
+        
         if let textLabel = picker.subviews.first?.subviews.first as? UILabel {
             textLabel.font = .systemFont(ofSize: 17)
         }
@@ -110,6 +109,7 @@ final class TrackersViewController: UIViewController {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.headerReferenceSize = CGSize(width: UIScreen.main.bounds.width, height: 50)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .systemBackground
@@ -131,18 +131,18 @@ final class TrackersViewController: UIViewController {
         return collectionView
     }()
     
-     // MARK: - Lifecycle
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
-         super.viewDidLoad()
-         setupViews()
-         setupNavigationBar()
-         setupPlaceholder()
-         setupCollectionView()
-         updatePlaceholderVisibility()
-     }
-     
-     // MARK: - Setup Methods
+        super.viewDidLoad()
+        setupViews()
+        setupNavigationBar()
+        setupPlaceholder()
+        setupCollectionView()
+        updatePlaceholderVisibility()
+    }
+    
+    // MARK: - Setup Methods
     
     private func setupViews() {
         view.backgroundColor = .systemBackground
@@ -179,9 +179,8 @@ final class TrackersViewController: UIViewController {
         navigationItem.rightBarButtonItem = dateBarButton
         print("\(#file):\(#line)] \(#function) Настроен NavigationBar с DatePicker")
     }
-
+    
     private func setupPlaceholder() {
-        
         placeholderStack.isHidden = false
         
         NSLayoutConstraint.activate([
@@ -229,7 +228,6 @@ final class TrackersViewController: UIViewController {
         
         placeholderStack.isHidden = hasVisibleTrackers
         collectionView.isHidden = !hasVisibleTrackers
-        
         print("\(#file):\(#line)] \(#function) Всего трекеров: \(categories.count), Видимых трекеров: \(filteredCategories.count)")
     }
     
@@ -241,11 +239,11 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupDatePickerFormat() {
-           datePicker.locale = Locale(identifier: "ru_RU")
-           var calendar = Calendar.current
-           calendar.locale = Locale(identifier: "ru_RU")
-           datePicker.calendar = calendar
-       }
+        datePicker.locale = Locale(identifier: "ru_RU")
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: "ru_RU")
+        datePicker.calendar = calendar
+    }
     
     private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
         let calendar = Calendar.current
@@ -272,14 +270,15 @@ final class TrackersViewController: UIViewController {
         return categories.map { $0.title }
     }
     
-    private func showCategoryList() {
+    func showCategoryList() {
         let categoryListController = CategoryListController()
-        categoryListController.categories = getCategoryTitles() // Передаем существующие категории
         categoryListController.delegate = self
         let navigationController = UINavigationController(rootViewController: categoryListController)
-        navigationController.modalPresentationStyle = .automatic
-        print("\(#file):\(#line)] \(#function) Переход к выбору категории с \(categories.count) категориями")
         present(navigationController, animated: true)
+        present(navigationController, animated: true)
+    }
+    func handleCategorySelection(_ category: String) {
+        print("Выбрана категория: \(category)")
     }
     
     // MARK: - TrackerManagement
@@ -288,21 +287,21 @@ final class TrackersViewController: UIViewController {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
         return completedTrackers.contains(completedID)
     }
-
+    
     func addTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
         completedTrackers.insert(completedID)
         print("\(#file):\(#line)] \(#function) Добавлен трекер: \(tracker.title) на дату: \(date)")
         collectionView.reloadData()
     }
-
+    
     func removeTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
         completedTrackers.remove(completedID)
         print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title) с даты: \(date)")
         collectionView.reloadData()
     }
-
+    
     func countCompletedDays(for tracker: Tracker) -> Int {
         completedTrackers.filter { $0.id == tracker.id }.count
     }
@@ -322,7 +321,6 @@ final class TrackersViewController: UIViewController {
     struct CompletedTrackerID: Hashable {
         let id: UUID
         let date: Date
-        
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
             hasher.combine(Calendar.current.startOfDay(for: date))
@@ -330,7 +328,7 @@ final class TrackersViewController: UIViewController {
         
         static func == (lhs: CompletedTrackerID, rhs: CompletedTrackerID) -> Bool {
             return lhs.id == rhs.id &&
-                   Calendar.current.isDate(lhs.date, inSameDayAs: rhs.date)
+            Calendar.current.isDate(lhs.date, inSameDayAs: rhs.date)
         }
     }
 }
@@ -368,15 +366,12 @@ extension TrackersViewController: UICollectionViewDelegate {
                     message: "Эта операция не может быть отменена",
                     preferredStyle: .alert
                 )
-                
                 alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
                 alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
                     self?.deleteTracker(at: indexPath)
                 })
-                
                 self.present(alert, animated: true)
             }
-            
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
         }
     }
@@ -396,6 +391,8 @@ extension TrackersViewController: NewHabitControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, category: String) {
         var newCategories = categories
         
+        print("\(#file):\(#line)] \(#function) Создание трекера \(tracker.title) в категории \(category)") // добавлен принт для отслеживания
+        
         if let index = categories.firstIndex(where: { $0.title == category }) {
             let existingCategory = categories[index]
             let newTrackers = existingCategory.trackers + [tracker]
@@ -412,6 +409,7 @@ extension TrackersViewController: NewHabitControllerDelegate {
             self.collectionView.reloadData()
             self.updatePlaceholderVisibility()
             print("\(#file):\(#line)] \(#function) Трекер добавлен в новый массив категорий. Всего категорий: \(self.categories.count)")
+            
         }
     }
 }
@@ -448,9 +446,9 @@ extension TrackersViewController {
         }
         
         let tracker = categories[categoryIndex].trackers[trackerIndex]
-            completedTrackers = completedTrackers.filter { $0.id != tracker.id }
-            var updatedTrackers = categories[categoryIndex].trackers
-            updatedTrackers.remove(at: trackerIndex)
+        completedTrackers = completedTrackers.filter { $0.id != tracker.id }
+        var updatedTrackers = categories[categoryIndex].trackers
+        updatedTrackers.remove(at: trackerIndex)
         
         if updatedTrackers.isEmpty {
             categories.remove(at: categoryIndex)
@@ -458,9 +456,7 @@ extension TrackersViewController {
         } else {
             categories[categoryIndex] = TrackerCategory(title: categories[categoryIndex].title, trackers: updatedTrackers)
         }
-        
         print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title)")
-        
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
@@ -468,8 +464,16 @@ extension TrackersViewController {
 
 extension TrackersViewController: CategoryListControllerDelegate {
     func didSelectCategory(_ category: String) {
-        // Обновим категорию в UI
-        // Здесь добавь обновление необходимых UI элементов
-        print("\(#file):\(#line)] \(#function) Получена категория: \(category)")
+        print("\(#file):\(#line)] \(#function) В TrackersViewController получена категория: \(category)")
+        print("\(#file):\(#line)] \(#function) Текущие категории: \(categories.map { $0.title })")
+        if !categories.contains(where: { $0.title == category }) {
+            createCategory(withTitle: category)
+        }
+        print("\(#file):\(#line)] \(#function) После обработки категорий: \(categories.map { $0.title })")
+    }
+    
+    func didUpdateCategories(_ categories: [String]) {
+        collectionView.reloadData()
+        print("\(#file):\(#line)] \(#function) Обновлены категории: \(categories)")
     }
 }

@@ -20,7 +20,7 @@ final class SupplementaryView: UICollectionReusableView {
     func configure(with title: String, color: UIColor = .black) {
         titleLabel.text = title
         titleLabel.textColor = color
-        print("\(#file):\(#line)] \(#function) Настройка заголовка: \(title), цвет: \(color)")
+        print("\(#file):\(#line)] \(#function) Настройка заголовка секции: \(title), цвет: \(color)")
     }
     
     override init(frame: CGRect) {
@@ -30,8 +30,9 @@ final class SupplementaryView: UICollectionReusableView {
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 28),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16), // добавим отступ сверху
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16), // и снизу
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -28) // добавим ограничение справа
         ])
     }
     

@@ -12,6 +12,7 @@ final class CategoryListController: UIViewController {
     var categories: [String] = ["Важное"] // Пока добавим только одну категорию для примера
     private var hasCategories: Bool = true
     weak var delegate: CategoryListControllerDelegate?
+    private var selectedCategory: String?
     
     // MARK: - UI Elements
     
@@ -79,13 +80,9 @@ final class CategoryListController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        // Пересчитываем высоту tableView после layout
         let numberOfRows = categories.count
         let rowHeight: CGFloat = 75
         let totalHeight = CGFloat(numberOfRows) * rowHeight
-        
-        // Обновление высоты tableView
         tableView.frame.size.height = totalHeight
     }
     
@@ -126,14 +123,10 @@ final class CategoryListController: UIViewController {
             addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-        
-        // Вычисление высоты tableView в зависимости от количества ячеек
-          let numberOfRows = categories.count
-          let rowHeight: CGFloat = 75 // Высота каждой ячейки
-          let totalHeight = CGFloat(numberOfRows) * rowHeight
-          
-          // Обновление констрейнта на высоту tableView
-          tableView.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
+        let numberOfRows = categories.count
+        let rowHeight: CGFloat = 75 // Высота каждой ячейки
+        let totalHeight = CGFloat(numberOfRows) * rowHeight
+        tableView.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
     }
     
     private func updateUI() {
@@ -147,7 +140,6 @@ final class CategoryListController: UIViewController {
         } else {
             tableView.separatorStyle = .none
         }
-
         print("\(#file):\(#line)] \(#function) Обновление UI. Есть категории: \(hasCategories)")
     }
     
@@ -169,45 +161,39 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-           cell.textLabel?.text = categories[indexPath.row]
-           
-           cell.backgroundColor = .white
-           cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
-           cell.selectionStyle = .none
-           
-           // Установка layoutMargins
-           cell.contentView.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
-           cell.preservesSuperviewLayoutMargins = false
-           
-           // Установка вертикального центрирования текста
-           if let textLabel = cell.textLabel {
-               textLabel.translatesAutoresizingMaskIntoConstraints = false
-               NSLayoutConstraint.activate([
-                   textLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
-                   textLabel.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: 16),
-                   textLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -16)
-               ])
-           }
-           
-           // Установка высоты ячейки через contentView
-           let heightConstraint = cell.contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 75)
-           heightConstraint.priority = .defaultHigh
-           heightConstraint.isActive = true
+        cell.textLabel?.text = categories[indexPath.row]
+        cell.backgroundColor = .white
+        cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
+        cell.selectionStyle = .none
+        cell.contentView.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
+        cell.preservesSuperviewLayoutMargins = false
         
+        if let textLabel = cell.textLabel {
+            textLabel.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                textLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+                textLabel.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: 16),
+                textLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -16)
+            ])
+        }
+        let heightConstraint = cell.contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 75)
+        heightConstraint.priority = .defaultHigh
+        heightConstraint.isActive = true
         if indexPath.row == categories.count - 1 {
-              cell.separatorInset = UIEdgeInsets(top: 0, left: tableView.bounds.width, bottom: 0, right: 0)
-          } else {
-              cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-          }
-           
-           print("\(#file):\(#line)] \(#function) Настроена ячейка категории: \(categories[indexPath.row]) для строки \(indexPath.row)")
-           return cell
-       }
+            cell.separatorInset = UIEdgeInsets(top: 0, left: tableView.bounds.width, bottom: 0, right: 0)
+        } else {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        }
+        print("\(#file):\(#line)] \(#function) Настроена ячейка категории: \(categories[indexPath.row]) для строки \(indexPath.row)")
+        return cell
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCategory = categories[indexPath.row]
         delegate?.didSelectCategory(selectedCategory)
+        delegate?.didUpdateCategories(categories)
         print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
         dismiss(animated: true)
     }
 }
+

@@ -376,6 +376,8 @@ final class NewHabitController: UIViewController {
     @objc private func categoryButtonTapped() {
         let categoryController = CategoryListController()
         categoryController.delegate = self
+        print("\(#file):\(#line)] \(#function) ОТЛАДКА: Делегат CategoryListController установлен: \(categoryController.delegate != nil)")
+          
         let navigationController = UINavigationController(rootViewController: categoryController)
         navigationController.modalPresentationStyle = .automatic
         print("\(#file):\(#line)] \(#function) Переход к выбору категории")
@@ -413,7 +415,6 @@ extension NewHabitController: NewScheduleControllerDelegate {
             )
             attributedString.append(daysString)
         }
-        
         scheduleButton.setAttributedTitle(attributedString, for: .normal)
         updateCreateButtonState()
     }
@@ -530,14 +531,14 @@ final class HabitColorCell: UICollectionViewCell {
 extension NewHabitController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-          updateCreateButtonState()
-          print("\(#file):\(#line)] \(#function) Начато редактирование текста")
-      }
-      
-      func textFieldDidChangeSelection(_ textField: UITextField) {
-          updateCreateButtonState()
-          print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
-      }
+        updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Начато редактирование текста")
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
+    }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -551,8 +552,8 @@ extension NewHabitController: UITextFieldDelegate {
             self.updateCreateButtonState()
         }
         return true
-       }
-   }
+    }
+}
 
 extension NewHabitController: CategoryListControllerDelegate {
     func didSelectCategory(_ category: String) {
@@ -566,7 +567,6 @@ extension NewHabitController: CategoryListControllerDelegate {
             ],
             range: NSRange(location: 0, length: title.count - 1)
         )
-
         let categoryString = NSAttributedString(
             string: category,
             attributes: [
@@ -575,9 +575,11 @@ extension NewHabitController: CategoryListControllerDelegate {
             ]
         )
         attributedString.append(categoryString)
-
         categoryButton.setAttributedTitle(attributedString, for: .normal)
-        print("\(#file):\(#line)] \(#function) Установлена категория: \(category)")
         updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Выбрана категория: \(category)")
     }
+    func didUpdateCategories(_ categories: [String]) {
+           print("\(#file):\(#line)] \(#function) Получено обновление категорий: \(categories)")
+       }
 }
