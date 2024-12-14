@@ -394,7 +394,7 @@ extension NewHabitController: NewScheduleControllerDelegate {
         print("\(#file):\(#line)] \(#function) Получено расписание: \(schedule)")
         
         let title = "Расписание\n"
-        let weekDays = schedule.map { $0.shortName }.joined(separator: ", ")
+        let weekDays = schedule.map { $0.shortForm }.joined(separator: ", ")
         
         let attributedString = NSMutableAttributedString(string: title)
         attributedString.addAttributes(
