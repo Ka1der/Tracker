@@ -16,15 +16,6 @@ final class CategoryListController: UIViewController {
     
     // MARK: - UI Elements
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Категория"
-        label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
     private lazy var placeholderImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "trackerPlaceholder")
@@ -72,6 +63,7 @@ final class CategoryListController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigationBar()
         setupViews()
         updateUI()
         tableView.reloadData()
@@ -90,23 +82,17 @@ final class CategoryListController: UIViewController {
     
     private func setupViews() {
         view.backgroundColor = .white
-        
-        view.addSubview(titleLabel)
         view.addSubview(placeholderImageView)
         view.addSubview(placeholderLabel)
         view.addSubview(addCategoryButton)
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-            // Констрейнты для titleLabel
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
             // Констрейнты для tableView
-            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+                     tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+                     tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+                     
             // Констрейнты для placeholderImageView
             placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -124,10 +110,11 @@ final class CategoryListController: UIViewController {
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60)
         ])
         let numberOfRows = categories.count
-        let rowHeight: CGFloat = 75 // Высота каждой ячейки
+        let rowHeight: CGFloat = 75
         let totalHeight = CGFloat(numberOfRows) * rowHeight
         tableView.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
-    }
+        print("\(#file):\(#line)] \(#function) Обновлены констрейнты заголовка категорий")
+      }
     
     private func updateUI() {
         hasCategories = !categories.isEmpty
@@ -141,6 +128,26 @@ final class CategoryListController: UIViewController {
             tableView.separatorStyle = .none
         }
         print("\(#file):\(#line)] \(#function) Обновление UI. Есть категории: \(hasCategories)")
+    }
+    
+    private func setupNavigationBar() {
+        navigationItem.title = "Категория"
+        if let navigationBar = navigationController?.navigationBar {
+            let appearance = UINavigationBarAppearance()
+            appearance.backgroundColor = .white
+            appearance.titleTextAttributes = [
+                .font: UIFont.systemFont(ofSize: 16, weight: .medium),
+                .foregroundColor: UIColor.black
+            ]
+            appearance.shadowColor = .clear
+            appearance.shadowImage = UIImage()
+            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = appearance
+            navigationBar.setBackgroundImage(UIImage(), for: .default)
+                   navigationBar.shadowImage = UIImage()
+                   
+                   print("\(#file):\(#line)] \(#function) Настроен NavigationBar без разделителя")
+        }
     }
     
     // MARK: - Actions
