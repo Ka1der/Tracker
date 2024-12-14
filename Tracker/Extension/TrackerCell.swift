@@ -101,7 +101,7 @@ final class TrackerCell: UICollectionViewCell {
             emojiLabel.centerXAnchor.constraint(equalTo: emojiView.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: emojiView.centerYAnchor),
             
-            titleLabel.topAnchor.constraint(equalTo: emojiView.bottomAnchor, constant: 8),
+            titleLabel.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -12),
             titleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
             
@@ -113,7 +113,7 @@ final class TrackerCell: UICollectionViewCell {
             counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             counterLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
         ])
-        
+        print("\(#file):\(#line)] \(#function) Обновлено положение заголовка трекера")
         print("\(#file):\(#line)] \(#function) Размеры кнопки: frame = \(completeButton.frame), bounds = \(completeButton.bounds)")
     }
     
