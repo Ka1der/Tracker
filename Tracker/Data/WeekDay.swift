@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  WeekDay.swift
 //  Tracker
 //
 //  Created by Kaider on 14.12.2024.

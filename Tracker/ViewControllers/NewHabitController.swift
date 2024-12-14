@@ -374,7 +374,7 @@ final class NewHabitController: UIViewController {
     }
     
     @objc private func categoryButtonTapped() {
-        let categoryController = NewCategoryController()
+        let categoryController = CategoryListController()
         categoryController.delegate = self
         let navigationController = UINavigationController(rootViewController: categoryController)
         navigationController.modalPresentationStyle = .automatic
@@ -554,7 +554,7 @@ extension NewHabitController: UITextFieldDelegate {
        }
    }
 
-extension NewHabitController: NewCategoryControllerDelegate {
+extension NewHabitController: CategoryListControllerDelegate {
     func didSelectCategory(_ category: String) {
         selectedCategory = category
         let title = "Категория\n"

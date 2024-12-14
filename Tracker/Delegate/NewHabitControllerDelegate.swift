@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  NewHabitControllerDelegate.swift
 //  Tracker
 //
 //  Created by Kaider on 07.12.2024.

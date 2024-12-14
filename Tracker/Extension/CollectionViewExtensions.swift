@@ -1,5 +1,5 @@
 //
-//  UICollectionViewDataSource.swift
+//  CollectionViewExtensions.swift
 //  Tracker
 //
 //  Created by Kaider on 01.12.2024.

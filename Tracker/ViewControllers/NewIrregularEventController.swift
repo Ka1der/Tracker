@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  NewIrregularEventController.swift
 //  Tracker
 //
 //  Created by Kaider on 10.12.2024.
