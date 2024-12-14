@@ -65,7 +65,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "SFPro-Bold", size: 12) ?? UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.font = .systemFont(ofSize: 12, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

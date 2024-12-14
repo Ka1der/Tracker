@@ -11,7 +11,8 @@ final class CategoryListController: UIViewController {
     
     // MARK: - Properties
     
-    private var categories: [String] = ["Важное"] // Пока добавим только одну категорию для примера
+    var categories: [String] = ["Важное"] // Пока добавим только одну категорию для примера
+    weak var delegate: CategoryListControllerDelegate?
     
     // MARK: - UI Elements
     
@@ -26,13 +27,15 @@ final class CategoryListController: UIViewController {
     
     private lazy var tableView: UITableView = {
         let table = UITableView()
-        table.backgroundColor = UIColor(named: "backgroundGray")
+        table.backgroundColor = .clear
+        table.separatorStyle = .none
         table.layer.cornerRadius = 16
-        table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        table.clipsToBounds = true
         table.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
         table.delegate = self
         table.dataSource = self
         table.translatesAutoresizingMaskIntoConstraints = false
+        table.isScrollEnabled = false
         return table
     }()
     
@@ -45,6 +48,17 @@ final class CategoryListController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var stackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 0
+        stack.backgroundColor = UIColor(named: "backgroundGray")
+        stack.layer.cornerRadius = 16
+        stack.clipsToBounds = true
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
     }()
     
     // MARK: - Lifecycle
@@ -64,7 +78,7 @@ final class CategoryListController: UIViewController {
         view.addSubview(doneButton)
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 13),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
@@ -96,13 +110,45 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = categories[indexPath.row]
-        cell.backgroundColor = .white
+        
+        // Настройка ячейки
+        cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
+        cell.backgroundColor = UIColor(named: "backgroundGray")
         cell.selectionStyle = .none
+        
+        // Настройка текста
+        cell.textLabel?.text = categories[indexPath.row]
+        cell.textLabel?.font = .systemFont(ofSize: 17)
+        cell.textLabel?.textColor = .black
+        
+        // Отступы
+        cell.contentView.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
+        cell.preservesSuperviewLayoutMargins = false
+        
+        // Скругление углов для первой и последней ячейки
+        if indexPath.row == 0 {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            cell.clipsToBounds = true
+        } else if indexPath.row == categories.count - 1 {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+            cell.clipsToBounds = true
+        } else {
+            cell.layer.cornerRadius = 0
+        }
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(#file):\(#line)] \(#function) Выбрана категория: \(categories[indexPath.row])")
+        let selectedCategory = categories[indexPath.row]
+        delegate?.didSelectCategory(selectedCategory)
+        print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
+        dismiss(animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 75
     }
 }

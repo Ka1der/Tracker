@@ -20,8 +20,8 @@ final class TabBarController: UITabBarController {
     func tabBarController() {
         let trackers = UINavigationController(rootViewController: trackerNavigationController)
         
-        let trackerText = [
-            NSAttributedString.Key.font: UIFont(name: ".SFProText-Medium", size: 10)
+        let trackerText: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 10, weight: .medium)
         ]
         trackers.tabBarItem = UITabBarItem(
             title: "Трекеры",

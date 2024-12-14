@@ -41,7 +41,7 @@ final class NewIrregularEventController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Новое нерегулярное событие"
-        label.font = UIFont(name: "SFPro-Medium", size: 16)
+        label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -73,7 +73,7 @@ final class NewIrregularEventController: UIViewController {
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
-        label.font = UIFont(name: "SFPro-Medium", size: 19)
+        label.font = .systemFont(ofSize: 19, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -81,7 +81,7 @@ final class NewIrregularEventController: UIViewController {
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
         label.text = "Цвет"
-        label.font = UIFont(name: "SFPro-Medium", size: 19)
+        label.font = .systemFont(ofSize: 19, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -194,12 +194,12 @@ final class NewIrregularEventController: UIViewController {
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
-            cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 56) / 2),
+            cancelButton.widthAnchor.constraint(equalToConstant: 166),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
             createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
-            createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 56) / 2),
+            createButton.widthAnchor.constraint(equalToConstant: 161),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
         

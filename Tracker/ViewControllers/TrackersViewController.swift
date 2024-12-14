@@ -11,6 +11,8 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - Properties
     
+    let layoutParams = LayoutParams()
+    
     var filteredCategories: [TrackerCategory] = []
     private var selectedCell: TrackerCell?
     var categories: [TrackerCategory] = []
@@ -23,6 +25,17 @@ final class TrackersViewController: UIViewController {
          formatter.locale = Locale(identifier: "ru")
          return formatter
      }()
+    
+    struct LayoutParams {
+        let columnCount: Int = 2
+        let interItemSpacing: CGFloat = 9
+        let leftInset: CGFloat = 16
+        let rightInset: CGFloat = 16
+        
+        var totalInsetWidth: CGFloat {
+            leftInset + rightInset + interItemSpacing * (CGFloat(columnCount) - 1)
+        }
+    }
     
     // MARK: - UI Elements
     
@@ -37,7 +50,7 @@ final class TrackersViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
-        label.font = UIFont(name: "SFPro-Bold", size: 34) ?? UIFont.systemFont(ofSize: 34, weight: .bold)
+        label.font = .systemFont(ofSize: 34, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -255,6 +268,20 @@ final class TrackersViewController: UIViewController {
         return filteredCategories
     }
     
+    private func getCategoryTitles() -> [String] {
+        return categories.map { $0.title }
+    }
+    
+    private func showCategoryList() {
+        let categoryListController = CategoryListController()
+        categoryListController.categories = getCategoryTitles() // Передаем существующие категории
+        categoryListController.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryListController)
+        navigationController.modalPresentationStyle = .automatic
+        print("\(#file):\(#line)] \(#function) Переход к выбору категории с \(categories.count) категориями")
+        present(navigationController, animated: true)
+    }
+    
     // MARK: - TrackerManagement
     
     func isTrackerCompleted(_ tracker: Tracker, date: Date) -> Bool {
@@ -436,5 +463,13 @@ extension TrackersViewController {
         
         collectionView.reloadData()
         updatePlaceholderVisibility()
+    }
+}
+
+extension TrackersViewController: CategoryListControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        // Обновим категорию в UI
+        // Здесь добавь обновление необходимых UI элементов
+        print("\(#file):\(#line)] \(#function) Получена категория: \(category)")
     }
 }

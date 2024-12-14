@@ -35,7 +35,7 @@ final class NewCategoryController: UIViewController {
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
         label.text = "Привычки и события можно\nобъединить по смыслу"
-        label.font = UIFont(name: "SFPro-Medium", size: 12) ?? UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.font = .systemFont(ofSize: 12, weight: .bold)
         
         label.numberOfLines = 2
         label.textAlignment = .center
@@ -88,42 +88,42 @@ final class NewCategoryController: UIViewController {
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-                   // Констрейнты для titleLabel
-                   titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
-                   titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                   
-                   // Констрейнты для tableView
-                   tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
-                   tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-                   tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-                   tableView.heightAnchor.constraint(equalToConstant: 75),
-                   
-                   // Констрейнты для placeholderImageView
-                   placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                   placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                   placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
-                   placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
-                   
-                   // Констрейнты для placeholderLabel
-                   placeholderLabel.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor, constant: 8),
-                   placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                   
-                   // Констрейнты для addCategoryButton
-                   addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                   addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                   addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-                   addCategoryButton.heightAnchor.constraint(equalToConstant: 60)
-               ])
-           }
+            // Констрейнты для titleLabel
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 13),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            // Констрейнты для tableView
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableView.heightAnchor.constraint(equalToConstant: 75),
+            
+            // Констрейнты для placeholderImageView
+            placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
+            placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
+            
+            // Констрейнты для placeholderLabel
+            placeholderLabel.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor, constant: 8),
+            placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            // Констрейнты для addCategoryButton
+            addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            addCategoryButton.heightAnchor.constraint(equalToConstant: 60)
+        ])
+    }
     
     private func updateUI() {
-           hasCategories = !categories.isEmpty
-           placeholderImageView.isHidden = hasCategories
-           placeholderLabel.isHidden = hasCategories
-           tableView.isHidden = !hasCategories
-           
-           print("\(#file):\(#line)] \(#function) Обновление UI. Есть категории: \(hasCategories)")
-       }
+        hasCategories = !categories.isEmpty
+        placeholderImageView.isHidden = hasCategories
+        placeholderLabel.isHidden = hasCategories
+        tableView.isHidden = !hasCategories
+        
+        print("\(#file):\(#line)] \(#function) Обновление UI. Есть категории: \(hasCategories)")
+    }
     
     // MARK: - Actions
     
@@ -150,9 +150,9 @@ extension NewCategoryController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-           let selectedCategory = categories[indexPath.row]
-           delegate?.didSelectCategory(selectedCategory)
-           print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
-           dismiss(animated: true)
-       }
-   }
+        let selectedCategory = categories[indexPath.row]
+        delegate?.didSelectCategory(selectedCategory)
+        print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
+        dismiss(animated: true)
+    }
+}

@@ -34,7 +34,7 @@ final class NewTrackerController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
-        label.font = UIFont(name: "SFPro-Medium", size: 16)
+        label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

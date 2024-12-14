@@ -75,7 +75,7 @@ extension TrackersViewController: UICollectionViewDataSource {
                 return UICollectionReusableView()
             }
             
-            view.titleLabel.text = categories[indexPath.section].title
+            view.configure(with: categories[indexPath.section].title)
             return view
             
         case UICollectionView.elementKindSectionFooter:
@@ -95,9 +95,32 @@ extension TrackersViewController: UICollectionViewDataSource {
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 167, height: 148)
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let availableWidth = collectionView.frame.width - layoutParams.totalInsetWidth
+        let cellWidth = availableWidth / CGFloat(layoutParams.columnCount)
+        return CGSize(width: cellWidth, height: 148)
     }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return layoutParams.interItemSpacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(
+            top: 8,
+            left: layoutParams.leftInset,
+            bottom: 8,
+            right: layoutParams.rightInset
+        )
+    }
+    
+}
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 9
@@ -110,4 +133,3 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     }
-}

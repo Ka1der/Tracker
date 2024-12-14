@@ -1,24 +1,11 @@
 //
-//  TrackerModels.swift
+//  Untitled.swift
 //  Tracker
 //
-//  Created by Kaider on 04.12.2024.
+//  Created by Kaider on 14.12.2024.
 //
 
-import UIKit
-
-// MARK: - Models
-
-struct Tracker {
-    let id: UUID
-    let title: String
-    let color: UIColor
-    let emoji: String
-    let scheldue: Set<WeekDay>
-    let isPinned: Bool
-}
-
-// MARK: - WeekDay
+import Foundation
 
 enum WeekDay: Int, CaseIterable {
     case monday = 1
@@ -41,17 +28,3 @@ enum WeekDay: Int, CaseIterable {
         }
     }
 }
-
-// MARK: - Supporting Types
-
-struct TrackerRecord {
-    let id: UUID // ID трекера
-    let date: Date
-}
-
-struct TrackerCategory {
-    let title: String
-    let trackers: [Tracker]
-}
-
-
