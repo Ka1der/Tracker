@@ -52,7 +52,7 @@ final class TrackerCell: UICollectionViewCell {
     }()
     
     private lazy var completeButton: UIButton = {
-        let button = UIButton(type: .system) // Изменяем тип кнопки
+        let button = UIButton(type: .system)
         let largeConfig = UIImage.SymbolConfiguration(pointSize: 34, weight: .medium, scale: .medium)
         let image = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)
         button.setImage(image, for: .normal)
