@@ -13,7 +13,6 @@ final class TrackersViewController: UIViewController {
     
     let layoutParams = LayoutParams()
     var filteredCategories: [TrackerCategory] = []
-    private var selectedCell: TrackerCell?
     var categories: [TrackerCategory] = []
     var currentDate: Date = Date()
     var completedTrackers: Set<CompletedTrackerID> = []
@@ -338,10 +337,6 @@ final class TrackersViewController: UIViewController {
 extension TrackersViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedCell?.titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
-        cell?.titleLabel.font = .boldSystemFont(ofSize: 17)
-        selectedCell = cell
         print("\(#file):\(#line)] \(#function) Выделена ячейка: \(indexPath.item)")
     }
     
@@ -377,10 +372,6 @@ extension TrackersViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell {
-            cell.titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        }
-        selectedCell = nil
         print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
     }
 }
@@ -436,27 +427,35 @@ extension TrackersViewController {
     }
     
     func deleteTracker(at indexPath: IndexPath) {
-        let categoryIndex = indexPath.section
-        let trackerIndex = indexPath.item
-        
-        guard categoryIndex < categories.count,
-              trackerIndex < categories[categoryIndex].trackers.count else {
-            print("\(#file):\(#line)] \(#function) Ошибка: некорректный индекс для удаления")
+        guard indexPath.section < filteredCategories.count else {
+            print("\(#file):\(#line)] \(#function) Ошибка: section \(indexPath.section) выходит за пределы filteredCategories (\(filteredCategories.count))")
             return
         }
         
-        let tracker = categories[categoryIndex].trackers[trackerIndex]
-        completedTrackers = completedTrackers.filter { $0.id != tracker.id }
+        guard indexPath.item < filteredCategories[indexPath.section].trackers.count else {
+            print("\(#file):\(#line)] \(#function) Ошибка: item \(indexPath.item) выходит за пределы trackers (\(filteredCategories[indexPath.section].trackers.count))")
+            return
+        }
+
+        let filteredTracker = filteredCategories[indexPath.section].trackers[indexPath.item]
+        guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategories[indexPath.section].title }),
+              let trackerIndex = categories[categoryIndex].trackers.firstIndex(where: { $0.id == filteredTracker.id }) else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не удалось найти соответствующий трекер в основном массиве")
+            return
+        }
+        completedTrackers = completedTrackers.filter { $0.id != filteredTracker.id }
         var updatedTrackers = categories[categoryIndex].trackers
         updatedTrackers.remove(at: trackerIndex)
         
         if updatedTrackers.isEmpty {
             categories.remove(at: categoryIndex)
-            print("\(#file):\(#line)] \(#function) Удалена пустая категория")
+            print("\(#file):\(#line)] \(#function) Удалена пустая категория: \(categories[categoryIndex].title)")
         } else {
             categories[categoryIndex] = TrackerCategory(title: categories[categoryIndex].title, trackers: updatedTrackers)
         }
-        print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title)")
+
+        filteredCategories = filterTrackersByDate(currentDate)
+        print("\(#file):\(#line)] \(#function) Успешно удален трекер: \(filteredTracker.title)")
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
