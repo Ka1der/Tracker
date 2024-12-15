@@ -437,32 +437,38 @@ extension TrackersViewController {
     
     func deleteTracker(at indexPath: IndexPath) {
         guard indexPath.section < filteredCategories.count else {
-            return
-        }
-        guard indexPath.item < filteredCategories[indexPath.section].trackers.count else {
+            print("\(#file):\(#line)] \(#function) Ошибка: индекс секции \(indexPath.section) выходит за пределы \(filteredCategories.count)")
             return
         }
         
-        let filteredTracker = filteredCategories[indexPath.section].trackers[indexPath.item]
-        guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategories[indexPath.section].title }),
-              let trackerIndex = categories[categoryIndex].trackers.firstIndex(where: { $0.id == filteredTracker.id }) else {
+        let filteredCategory = filteredCategories[indexPath.section]
+        guard indexPath.item < filteredCategory.trackers.count else {
+            print("\(#file):\(#line)] \(#function) Ошибка: индекс трекера \(indexPath.item) выходит за пределы \(filteredCategory.trackers.count)")
             return
         }
-        completedTrackers = completedTrackers.filter { $0.id != filteredTracker.id }
+        let trackerToDelete = filteredCategory.trackers[indexPath.item]
+        guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) else {
+            print("\(#file):\(#line)] \(#function) Ошибка: категория не найдена \(filteredCategory.title)")
+            return
+        }
         var updatedTrackers = categories[categoryIndex].trackers
-        updatedTrackers.remove(at: trackerIndex)
-        
-        if updatedTrackers.isEmpty {
-            categories.remove(at: categoryIndex)
-            print("\(#file):\(#line)] \(#function) Удалена пустая категория: \(categories[categoryIndex].title)")
+        if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == trackerToDelete.id }) {
+            updatedTrackers.remove(at: trackerIndex)
+            completedTrackers = completedTrackers.filter { $0.id != trackerToDelete.id }
+            
+            if updatedTrackers.isEmpty {
+                categories.remove(at: categoryIndex)
+                print("\(#file):\(#line)] \(#function) Категория удалена: \(filteredCategory.title)")
+            } else {
+                categories[categoryIndex] = TrackerCategory(title: filteredCategory.title, trackers: updatedTrackers)
+            }
+            filteredCategories = filterTrackersByDate(currentDate)
+            print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
+            collectionView.reloadData()
+            updatePlaceholderVisibility()
         } else {
-            categories[categoryIndex] = TrackerCategory(title: categories[categoryIndex].title, trackers: updatedTrackers)
+            print("\(#file):\(#line)] \(#function) Ошибка: трекер не найден в категории")
         }
-        
-        filteredCategories = filterTrackersByDate(currentDate)
-        print("\(#file):\(#line)] \(#function) Успешно удален трекер: \(filteredTracker.title)")
-        collectionView.reloadData()
-        updatePlaceholderVisibility()
     }
 }
 
