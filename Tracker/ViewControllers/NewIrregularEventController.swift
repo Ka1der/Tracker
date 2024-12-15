@@ -185,7 +185,7 @@ final class NewIrregularEventController: UIViewController {
         view.addSubview(createButton)
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 13),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),

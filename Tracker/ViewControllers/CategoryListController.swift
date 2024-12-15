@@ -114,6 +114,7 @@ final class CategoryListController: UIViewController {
         let totalHeight = CGFloat(numberOfRows) * rowHeight
         tableView.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
         print("\(#file):\(#line)] \(#function) Обновлены констрейнты заголовка категорий")
+        
     }
     
     private func updateUI() {
@@ -131,24 +132,36 @@ final class CategoryListController: UIViewController {
     }
     
     private func setupNavigationBar() {
-        navigationItem.title = "Категория"
-        if let navigationBar = navigationController?.navigationBar {
-            let appearance = UINavigationBarAppearance()
-            appearance.backgroundColor = .white
-            appearance.titleTextAttributes = [
-                .font: UIFont.systemFont(ofSize: 16, weight: .medium),
-                .foregroundColor: UIColor.black
-            ]
-            appearance.shadowColor = .clear
-            appearance.shadowImage = UIImage()
-            navigationBar.standardAppearance = appearance
-            navigationBar.scrollEdgeAppearance = appearance
-            navigationBar.setBackgroundImage(UIImage(), for: .default)
-            navigationBar.shadowImage = UIImage()
-            
-            print("\(#file):\(#line)] \(#function) Настроен NavigationBar без разделителя")
-        }
-    }
+        let titleLabel = UILabel()
+         titleLabel.text = "Категория"
+         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
+         titleLabel.textColor = .black
+         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+         
+         let containerView = UIView()
+         containerView.addSubview(titleLabel)
+         
+         NSLayoutConstraint.activate([
+             titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 27),
+             titleLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+             titleLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+         ])
+         
+         navigationItem.titleView = containerView
+         
+         if let navigationBar = navigationController?.navigationBar {
+             let appearance = UINavigationBarAppearance()
+             appearance.backgroundColor = .white
+             appearance.configureWithOpaqueBackground()
+             appearance.shadowColor = .clear
+             appearance.shadowImage = UIImage()
+             
+             navigationBar.standardAppearance = appearance
+             navigationBar.scrollEdgeAppearance = appearance
+             navigationBar.setBackgroundImage(UIImage(), for: .default)
+             navigationBar.shadowImage = UIImage()
+         }
+     }
     
     // MARK: - Actions
     
