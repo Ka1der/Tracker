@@ -204,22 +204,35 @@ final class TrackersViewController: UIViewController {
         let calendar = Calendar.current
         let weekday = calendar.component(.weekday, from: date)
         let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
+        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
+        
         let filteredCategories = categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
                 let isIrregularEvent = tracker.scheldue.count == 1 && tracker.creationDate != nil
                 if isIrregularEvent {
-                    guard let creationDate = tracker.creationDate else { return false }
-                    let isSameDay = calendar.isDate(date, inSameDayAs: creationDate)
-                    print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)': создано \(creationDate), показывать: \(isSameDay)")
-                    return isSameDay
+                    let isCompletedInAnyDay = completedTrackers.contains { completedID in
+                        completedID.id == tracker.id
+                    }
+                    if isCompletedInAnyDay {
+                        let isCompletedOnThisDay = completedTrackers.contains { completedID in
+                            completedID.id == tracker.id && calendar.isDate(completedID.date, inSameDayAs: date)
+                        }
+                        print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)' выполнено, отображается: \(isCompletedOnThisDay)")
+                        return isCompletedOnThisDay
+                    } else {
+                        print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)' не выполнено, отображается")
+                        return true
+                    }
                 } else {
                     let isScheduledForToday = tracker.scheldue.contains(adjustedWeekday)
                     print("\(#file):\(#line)] \(#function) Регулярная привычка '\(tracker.title)': запланирована на \(adjustedWeekday.shortName), показывать: \(isScheduledForToday)")
                     return isScheduledForToday
                 }
             }
+            
             return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
         }
+        print("\(#file):\(#line)] \(#function) Найдено после фильтрации: категорий - \(filteredCategories.count), трекеров - \(filteredCategories.reduce(0) { $0 + $1.trackers.count })")
         return filteredCategories
     }
     

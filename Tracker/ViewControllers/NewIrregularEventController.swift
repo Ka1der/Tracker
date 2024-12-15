@@ -272,7 +272,7 @@ final class NewIrregularEventController: UIViewController {
         let newTracker = Tracker(
             id: UUID(),
             title: title,
-            color: .systemBlue,
+            color: .systemRed,
             emoji: "📝",
             scheldue: [currentWeekDay],
             isPinned: false,
