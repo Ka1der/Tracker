@@ -229,7 +229,6 @@ final class TrackersViewController: UIViewController {
                     return isScheduledForToday
                 }
             }
-            
             return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
         }
         print("\(#file):\(#line)] \(#function) Найдено после фильтрации: категорий - \(filteredCategories.count), трекеров - \(filteredCategories.reduce(0) { $0 + $1.trackers.count })")

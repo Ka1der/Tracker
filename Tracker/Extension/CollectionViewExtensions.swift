@@ -7,6 +7,17 @@
 
 import UIKit
 
+struct LayoutParams {
+    let columnCount: Int = 2
+    let interItemSpacing: CGFloat = 7
+    let leftInset: CGFloat = 16
+    let rightInset: CGFloat = 16
+    
+    var totalInsetWidth: CGFloat {
+        leftInset + rightInset + interItemSpacing * (CGFloat(columnCount) - 1)
+    }
+}
+
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -98,35 +109,28 @@ extension TrackersViewController: UICollectionViewDataSource {
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let availableWidth = collectionView.frame.width - layoutParams.totalInsetWidth
-        let cellWidth = availableWidth / CGFloat(layoutParams.columnCount)
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let availableWidth = collectionView.frame.width - (layoutParams.leftInset + layoutParams.rightInset)
+        let cellWidth = (availableWidth - layoutParams.interItemSpacing) / CGFloat(layoutParams.columnCount)
         return CGSize(width: cellWidth, height: 148)
     }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return layoutParams.interItemSpacing
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        insetForSectionAt section: Int) -> UIEdgeInsets {
-        let insets = UIEdgeInsets(
-            top: 16,
-            left: layoutParams.leftInset,
-            bottom: 16,
-            right: layoutParams.rightInset
-        )
-        print("\(#file):\(#line)] \(#function) Отступы для секции \(section): \(insets)")
-        return insets
-    }
-}
 
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-    let size = CGSize(width: collectionView.frame.width, height: 18)
-    print("\(#file):\(#line)] \(#function) Размер хедера для секции \(section): \(size)")
-    return size
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 7
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 8, left: 16, bottom: 16, right: 16)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let size = CGSize(width: collectionView.frame.width, height: 18)
+        print("\(#file):\(#line)] \(#function) Размер хедера для секции \(section): \(size)")
+        return size
+    }
 }
