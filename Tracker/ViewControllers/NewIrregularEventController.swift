@@ -155,10 +155,10 @@ final class NewIrregularEventController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(nameTextField)
         view.addSubview(categoryButton)
-        view.addSubview(emojiLabel)
-        view.addSubview(emojiCollectionView)
-        view.addSubview(colorLabel)
-        view.addSubview(colorCollectionView)
+//        view.addSubview(emojiLabel)
+//        view.addSubview(emojiCollectionView)
+//        view.addSubview(colorLabel)
+//        view.addSubview(colorCollectionView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
@@ -176,21 +176,21 @@ final class NewIrregularEventController: UIViewController {
             categoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
             
-            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
-            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            
-            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
-            
-            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
-            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            
-            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
-            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
+//            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
+//            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+//            
+//            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
+//            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
+//            
+//            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+//            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+//            
+//            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
+//            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
