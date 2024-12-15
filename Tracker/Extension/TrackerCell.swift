@@ -155,10 +155,10 @@ final class TrackerCell: UICollectionViewCell {
         completeButton.setImage(image, for: .normal)
         
         if isCompleted {
-              completeButton.alpha = 0.3
-          } else {
-              completeButton.alpha = 1.0
-          }
+            completeButton.alpha = 0.3
+        } else {
+            completeButton.alpha = 1.0
+        }
         
         print("\(#file):\(#line)] \(#function) Обновлено состояние кнопки: \(isCompleted ? "выполнено" : "не выполнено")")
     }

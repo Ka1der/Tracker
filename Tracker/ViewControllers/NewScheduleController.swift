@@ -124,9 +124,8 @@ final class NewScheduleController: UIViewController {
         ])
         
         if day == .sunday {
-               separator.isHidden = true
-           }
-        
+            separator.isHidden = true
+        }
         return container
     }
     
@@ -139,13 +138,12 @@ final class NewScheduleController: UIViewController {
         } else {
             selectedWeekDays.remove(day)
         }
-        
         print("\(#file):\(#line)] \(#function) Выбранные дни: \(selectedWeekDays)")
     }
     
     @objc private func doneButtonTapped() {
-           delegate?.didUpdateSchedule(selectedWeekDays)
-           print("\(#file):\(#line)] \(#function) Сохранено расписание: \(selectedWeekDays)")
-           dismiss(animated: true)
-       }
-   }
+        delegate?.didUpdateSchedule(selectedWeekDays)
+        print("\(#file):\(#line)] \(#function) Сохранено расписание: \(selectedWeekDays)")
+        dismiss(animated: true)
+    }
+}

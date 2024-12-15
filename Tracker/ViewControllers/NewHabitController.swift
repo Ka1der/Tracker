@@ -14,6 +14,7 @@ final class NewHabitController: UIViewController {
     weak var delegate: NewHabitControllerDelegate?
     private var schedule: Set<WeekDay> = []
     private var selectedCategory: String?
+    private var isFormValid: Bool = false
     
     private let colors: [UIColor] = [
         .systemRed,
@@ -39,8 +40,6 @@ final class NewHabitController: UIViewController {
     private let emojis = ["😊", "🐱", "🎯", "🐶", "❤️", "😱",
                           "😇", "😡", "🥶", "🤔", "🌟", "🍔",
                           "🥦", "🏓", "🥇", "🎸", "🌴", "😭"]
-    
-    private var isFormValid: Bool = false
     
     // MARK: - UI Elements
     
@@ -69,26 +68,20 @@ final class NewHabitController: UIViewController {
     
     private lazy var categoryButton: UIButton = {
         let button = UIButton()
-        
         let attributedString = NSMutableAttributedString(
             string: "Категория",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 17),
-                .foregroundColor: UIColor.black
-            ]
-        )
-        
+                .foregroundColor: UIColor.black])
         button.setAttributedTitle(attributedString, for: .normal)
         button.contentHorizontalAlignment = .left
         button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
-        
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
         button.tintColor = .gray
         button.titleLabel?.numberOfLines = 0
-        
         return button
     }()
     
@@ -105,7 +98,6 @@ final class NewHabitController: UIViewController {
         button.setImage(chevronImage, for: .normal)
         button.tintColor = .gray
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
-        
         return button
     }()
     
@@ -140,7 +132,7 @@ final class NewHabitController: UIViewController {
         layout.minimumLineSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 18)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(HabitEmojiCell.self, forCellWithReuseIdentifier: "EmojiCell")
+        collectionView.register(TrackerEmojiCell.self, forCellWithReuseIdentifier: "EmojiCell")
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -155,7 +147,7 @@ final class NewHabitController: UIViewController {
         layout.minimumLineSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 18)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(HabitColorCell.self, forCellWithReuseIdentifier: "ColorCell")
+        collectionView.register(TrackerColorCell.self, forCellWithReuseIdentifier: "ColorCell")
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -213,7 +205,6 @@ final class NewHabitController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         [categoryButton, scheduleButton].forEach { button in
             button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 40, bottom: 0, right: 16)
         }
@@ -313,11 +304,9 @@ final class NewHabitController: UIViewController {
             print("\(#file):\(#line)] \(#function) TextField.text == nil")
             return
         }
-        
         let hasText = !text.isEmpty
         let hasSchedule = !schedule.isEmpty
         isFormValid = hasText && hasSchedule
-        
         print("\(#file):\(#line)] \(#function) Состояние формы - текст: \(hasText), расписание: \(hasSchedule)")
         
         if isFormValid {
@@ -435,95 +424,13 @@ extension NewHabitController: UICollectionViewDelegate, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! HabitEmojiCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! TrackerEmojiCell
             cell.configure(with: emojis[indexPath.item])
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! HabitColorCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! TrackerColorCell
             cell.configure(with: colors[indexPath.item])
             return cell
-        }
-    }
-}
-
-// MARK: - Cells
-
-final class HabitEmojiCell: UICollectionViewCell {
-    private let emojiLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 32)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupView() {
-        contentView.addSubview(emojiLabel)
-        contentView.layer.cornerRadius = 16
-        
-        NSLayoutConstraint.activate([
-            emojiLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
-    }
-    
-    func configure(with emoji: String) {
-        emojiLabel.text = emoji
-    }
-    
-    override var isSelected: Bool {
-        didSet {
-            contentView.backgroundColor = isSelected ? .systemGray5 : .clear
-        }
-    }
-}
-
-final class HabitColorCell: UICollectionViewCell {
-    private let colorView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 8
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupView() {
-        contentView.addSubview(colorView)
-        
-        NSLayoutConstraint.activate([
-            colorView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            colorView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            colorView.widthAnchor.constraint(equalToConstant: 40),
-            colorView.heightAnchor.constraint(equalToConstant: 40)
-        ])
-    }
-    
-    func configure(with color: UIColor) {
-        colorView.backgroundColor = color
-    }
-    
-    override var isSelected: Bool {
-        didSet {
-            contentView.layer.borderWidth = isSelected ? 3 : 0
-            contentView.layer.borderColor = colorView.backgroundColor?.withAlphaComponent(0.3).cgColor
-            contentView.layer.cornerRadius = 8
         }
     }
 }

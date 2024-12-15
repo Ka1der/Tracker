@@ -76,10 +76,10 @@ extension TrackersViewController: UICollectionViewDataSource {
             }
             
             let title = filteredCategories[indexPath.section].title
-                   view.configure(with: title)
-                   print("\(#file):\(#line)] \(#function) Настроен header с заголовком: \(title)")
-                   return view
-                   
+            view.configure(with: title)
+            print("\(#file):\(#line)] \(#function) Настроен header с заголовком: \(title)")
+            return view
+            
             
         case UICollectionView.elementKindSectionFooter:
             return UICollectionReusableView()
@@ -115,30 +115,18 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
         let insets = UIEdgeInsets(
-                top: 16,
-                left: layoutParams.leftInset,
-                bottom: 16,
-                right: layoutParams.rightInset
-            )
+            top: 16,
+            left: layoutParams.leftInset,
+            bottom: 16,
+            right: layoutParams.rightInset
+        )
         print("\(#file):\(#line)] \(#function) Отступы для секции \(section): \(insets)")
-          return insets
+        return insets
     }
-}
-
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    return 9
-}
-
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    return 0
-}
-
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-    return UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
 }
 
 func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
     let size = CGSize(width: collectionView.frame.width, height: 18)
-      print("\(#file):\(#line)] \(#function) Размер хедера для секции \(section): \(size)")
-      return size
+    print("\(#file):\(#line)] \(#function) Размер хедера для секции \(section): \(size)")
+    return size
 }

@@ -10,16 +10,16 @@ import UIKit
 final class OnboardingViewController: UIViewController {
     
     private let backgroundImageView: UIImageView = {
-           let imageView = UIImageView()
-           guard let image = UIImage(named: "onboardingScreen1") else {
-               print("\(#file):\(#line)] Ошибка загрузки изображения onboardingScreen1")
-               return imageView
-           }
-           imageView.image = image
-           imageView.contentMode = .scaleAspectFill
-           imageView.translatesAutoresizingMaskIntoConstraints = false
-           return imageView
-       }()
+        let imageView = UIImageView()
+        guard let image = UIImage(named: "onboardingScreen1") else {
+            print("\(#file):\(#line)] Ошибка загрузки изображения onboardingScreen1")
+            return imageView
+        }
+        imageView.image = image
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     private let wowTechnologyButton: UIButton = {
         let button = UIButton()

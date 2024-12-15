@@ -9,7 +9,7 @@ import UIKit
 
 final class SupplementaryView: UICollectionReusableView {
     
-   private let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 19)
         label.textColor = .black
@@ -37,7 +37,8 @@ final class SupplementaryView: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("\(#file):\(#line)] \(#function) Ошибка: init(coder:) не реализован")
+        return nil
     }
     
     

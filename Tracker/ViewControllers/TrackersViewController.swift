@@ -275,7 +275,6 @@ final class TrackersViewController: UIViewController {
         categoryListController.delegate = self
         let navigationController = UINavigationController(rootViewController: categoryListController)
         present(navigationController, animated: true)
-        present(navigationController, animated: true)
     }
     func handleCategorySelection(_ category: String) {
         print("Выбрана категория: \(category)")
@@ -410,7 +409,6 @@ extension TrackersViewController {
     
     func addTracker(_ tracker: Tracker, to categoryTitle: String) {
         var newCategories = categories
-        
         if let categoryIndex = categories.firstIndex(where: { $0.title == categoryTitle }) {
             let existingCategory = categories[categoryIndex]
             let newTrackers = existingCategory.trackers + [tracker]
@@ -437,7 +435,7 @@ extension TrackersViewController {
             print("\(#file):\(#line)] \(#function) Ошибка: item \(indexPath.item) выходит за пределы trackers (\(filteredCategories[indexPath.section].trackers.count))")
             return
         }
-
+        
         let filteredTracker = filteredCategories[indexPath.section].trackers[indexPath.item]
         guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategories[indexPath.section].title }),
               let trackerIndex = categories[categoryIndex].trackers.firstIndex(where: { $0.id == filteredTracker.id }) else {
@@ -454,7 +452,7 @@ extension TrackersViewController {
         } else {
             categories[categoryIndex] = TrackerCategory(title: categories[categoryIndex].title, trackers: updatedTrackers)
         }
-
+        
         filteredCategories = filterTrackersByDate(currentDate)
         print("\(#file):\(#line)] \(#function) Успешно удален трекер: \(filteredTracker.title)")
         collectionView.reloadData()

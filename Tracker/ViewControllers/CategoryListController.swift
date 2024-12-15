@@ -90,9 +90,9 @@ final class CategoryListController: UIViewController {
         NSLayoutConstraint.activate([
             // Констрейнты для tableView
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
-                     tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-                     tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-                     
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
             // Констрейнты для placeholderImageView
             placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -114,7 +114,7 @@ final class CategoryListController: UIViewController {
         let totalHeight = CGFloat(numberOfRows) * rowHeight
         tableView.heightAnchor.constraint(equalToConstant: totalHeight).isActive = true
         print("\(#file):\(#line)] \(#function) Обновлены констрейнты заголовка категорий")
-      }
+    }
     
     private func updateUI() {
         hasCategories = !categories.isEmpty
@@ -144,9 +144,9 @@ final class CategoryListController: UIViewController {
             navigationBar.standardAppearance = appearance
             navigationBar.scrollEdgeAppearance = appearance
             navigationBar.setBackgroundImage(UIImage(), for: .default)
-                   navigationBar.shadowImage = UIImage()
-                   
-                   print("\(#file):\(#line)] \(#function) Настроен NavigationBar без разделителя")
+            navigationBar.shadowImage = UIImage()
+            
+            print("\(#file):\(#line)] \(#function) Настроен NavigationBar без разделителя")
         }
     }
     
