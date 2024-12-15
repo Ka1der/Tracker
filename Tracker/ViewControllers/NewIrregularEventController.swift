@@ -11,6 +11,10 @@ final class NewIrregularEventController: UIViewController {
     
     // MARK: - Properties
     
+    private var selectedCategory: String?
+    private var isFormValid: Bool = false
+    weak var delegate: NewHabitControllerDelegate?
+    
     private let colors: [UIColor] = [
         .systemRed,
         .systemOrange,
@@ -50,10 +54,12 @@ final class NewIrregularEventController: UIViewController {
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
-        textField.backgroundColor = .systemGray6
+        textField.backgroundColor = UIColor(named: "backgroundGray")
         textField.layer.cornerRadius = 16
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
         textField.leftViewMode = .always
+        textField.tintColor = .black
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -64,9 +70,16 @@ final class NewIrregularEventController: UIViewController {
         button.setTitleColor(.black, for: .normal)
         button.contentHorizontalAlignment = .left
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
+        
+        let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
+        button.setImage(chevronImage, for: .normal)
+        button.tintColor = .gray
+        button.backgroundColor = UIColor(named: "backgroundGray")
+        button.layer.cornerRadius = 16
+        button.titleLabel?.numberOfLines = 0
+        
         return button
     }()
     
@@ -145,6 +158,15 @@ final class NewIrregularEventController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        nameTextField.delegate = self
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        [categoryButton].forEach { button in
+            button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 40, bottom: 0, right: 16)
+        }
     }
     
     // MARK: - Setup
@@ -155,10 +177,10 @@ final class NewIrregularEventController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(nameTextField)
         view.addSubview(categoryButton)
-//        view.addSubview(emojiLabel)
-//        view.addSubview(emojiCollectionView)
-//        view.addSubview(colorLabel)
-//        view.addSubview(colorCollectionView)
+        //        view.addSubview(emojiLabel)
+        //        view.addSubview(emojiCollectionView)
+        //        view.addSubview(colorLabel)
+        //        view.addSubview(colorCollectionView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
@@ -176,21 +198,21 @@ final class NewIrregularEventController: UIViewController {
             categoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
             
-//            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
-//            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-//            
-//            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
-//            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
-//            
-//            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
-//            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-//            
-//            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
-//            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            //            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
+            //            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            //
+            //            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
+            //            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            //            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            //            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            //
+            //            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+            //            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            //
+            //            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
+            //            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            //            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            //            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
@@ -202,9 +224,30 @@ final class NewIrregularEventController: UIViewController {
             createButton.widthAnchor.constraint(equalToConstant: 161),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-        
-        
         print("\(#file):\(#line)] \(#function) Настроен интерфейс IrregularEventViewController")
+    }
+    
+    private func updateCreateButtonState() {
+        guard let text = nameTextField.text else {
+            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+            createButton.isEnabled = false
+            print("\(#file):\(#line)] \(#function) TextField.text == nil")
+            return
+        }
+        
+        let hasText = !text.isEmpty
+        let hasCategory = selectedCategory != nil
+        isFormValid = hasText && hasCategory
+        
+        print("\(#file):\(#line)] \(#function) Состояние формы - текст: \(hasText), категория: \(hasCategory)")
+        
+        if isFormValid {
+            createButton.backgroundColor = .blackYPBlack
+            createButton.isEnabled = true
+        } else {
+            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+            createButton.isEnabled = false
+        }
     }
     
     // MARK: - Actions
@@ -215,8 +258,44 @@ final class NewIrregularEventController: UIViewController {
     }
     
     @objc private func createButtonTapped() {
-        // TODO: Implement creation logic
-        print("\(#file):\(#line)] \(#function) Создание нового нерегулярного события")
+        guard let title = nameTextField.text, !title.isEmpty else {
+            print("\(#file):\(#line)] \(#function) Ошибка: пустое название трекера")
+            return
+        }
+        
+        guard let category = selectedCategory else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбрана категория")
+            return
+        }
+        
+        let currentDate = Date()
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: currentDate)
+        let currentWeekDay = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
+        
+        let newTracker = Tracker(
+            id: UUID(),
+            title: title,
+            color: .systemBlue,
+            emoji: "📝",
+            scheldue: [currentWeekDay],
+            isPinned: false,
+            creationDate: Date()
+        )
+        
+        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
+        
+        delegate?.didCreateTracker(newTracker, category: category)
+        dismiss(animated: true)
+    }
+    
+    @objc private func categoryButtonTapped() {
+        let categoryListController = CategoryListController()
+        categoryListController.delegate = self
+        let navigationController = UINavigationController(rootViewController: categoryListController)
+        navigationController.modalPresentationStyle = .automatic
+        print("\(#file):\(#line)] \(#function) Переход к выбору категории")
+        present(navigationController, animated: true)
     }
 }
 
@@ -323,5 +402,55 @@ final class ColorCell: UICollectionViewCell {
             contentView.layer.borderColor = colorView.backgroundColor?.withAlphaComponent(0.3).cgColor
             contentView.layer.cornerRadius = 8
         }
+    }
+}
+
+extension NewIrregularEventController: CategoryListControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        selectedCategory = category
+        let title = "Категория\n"
+        let attributedString = NSMutableAttributedString(string: title)
+        attributedString.addAttributes(
+            [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ],
+            range: NSRange(location: 0, length: title.count - 1)
+        )
+        let categoryString = NSAttributedString(
+            string: category,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor(named: "textGray") ?? .gray
+            ]
+        )
+        attributedString.append(categoryString)
+        categoryButton.setAttributedTitle(attributedString, for: .normal)
+        updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Выбрана категория: \(category)")
+    }
+    
+    func didUpdateCategories(_ categories: [String]) {
+        print("\(#file):\(#line)] \(#function) Обновлены категории: \(categories)")
+    }
+}
+
+// MARK: - UITextFieldDelegate
+
+extension NewIrregularEventController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Начато редактирование текста")
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        updateCreateButtonState()
+        print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
+        return true
     }
 }

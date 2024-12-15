@@ -14,5 +14,6 @@ struct Tracker {
     let emoji: String
     let scheldue: Set<WeekDay>
     let isPinned: Bool
+    let creationDate: Date?
 }
 

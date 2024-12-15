@@ -353,10 +353,11 @@ final class NewHabitController: UIViewController {
             color: .systemBlue,
             emoji: "📝",
             scheldue: schedule,
-            isPinned: false
+            isPinned: false,
+            creationDate: nil
         )
         
-        let category = selectedCategory ?? "Важное"  // Используем выбранную категорию или дефолтную
+        let category = selectedCategory ?? "Важное"
         print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
         
         delegate?.didCreateTracker(newTracker, category: category)
@@ -385,7 +386,6 @@ final class NewHabitController: UIViewController {
         print("\(#file):\(#line)] \(#function) Переход к выбору категории")
         present(navigationController, animated: true)
     }
-    
 }
 
 // MARK: - NewScheduleControllerDelegate

@@ -200,6 +200,32 @@ final class TrackersViewController: UIViewController {
         ])
     }
     
+    private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
+        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
+        let filteredCategories = categories.compactMap { category in
+            let filteredTrackers = category.trackers.filter { tracker in
+                let isIrregularEvent = tracker.scheldue.count == 1 && tracker.creationDate != nil
+                if isIrregularEvent {
+                    guard let creationDate = tracker.creationDate else { return false }
+                    let isSameDay = calendar.isDate(date, inSameDayAs: creationDate)
+                    print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)': создано \(creationDate), показывать: \(isSameDay)")
+                    return isSameDay
+                } else {
+                    let isScheduledForToday = tracker.scheldue.contains(adjustedWeekday)
+                    print("\(#file):\(#line)] \(#function) Регулярная привычка '\(tracker.title)': запланирована на \(adjustedWeekday.shortName), показывать: \(isScheduledForToday)")
+                    return isScheduledForToday
+                }
+            }
+            
+            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+        }
+        print("\(#file):\(#line)] \(#function) Найдено после фильтрации: категорий - \(filteredCategories.count), трекеров - \(filteredCategories.reduce(0) { $0 + $1.trackers.count })")
+        return filteredCategories
+    }
+    
     // MARK: - Actions
     
     @objc private func addButtonTapped() {
@@ -242,31 +268,6 @@ final class TrackersViewController: UIViewController {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ru_RU")
         datePicker.calendar = calendar
-    }
-    
-    private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
-        
-        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
-        
-        let filteredCategories = categories.compactMap { category in
-            let filteredTrackers = category.trackers.filter { tracker in
-                let shouldDisplay = tracker.scheldue.contains(adjustedWeekday)
-                print("\(#file):\(#line)] \(#function) Трекер '\(tracker.title)': расписание [\(tracker.scheldue.map { $0.shortName }.joined(separator: ", "))], отображать: \(shouldDisplay)")
-                return shouldDisplay
-            }
-            
-            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
-        }
-        
-        print("\(#file):\(#line)] \(#function) Найдено категорий после фильтрации: \(filteredCategories.count)")
-        return filteredCategories
-    }
-    
-    private func getCategoryTitles() -> [String] {
-        return categories.map { $0.title }
     }
     
     func showCategoryList() {
