@@ -270,12 +270,14 @@ final class TrackersViewController: UIViewController {
         datePicker.calendar = calendar
     }
     
-    func showCategoryList() {
-        let categoryListController = CategoryListController()
+    func showCategoryList(selectedCategory: String? = nil) {
+        let categoryListController = CategoryListController(selectedCategory: selectedCategory)
         categoryListController.delegate = self
         let navigationController = UINavigationController(rootViewController: categoryListController)
         present(navigationController, animated: true)
+        print("\(#file):\(#line)] \(#function) Открыт список категорий с категорией: \(String(describing: selectedCategory))")
     }
+    
     func handleCategorySelection(_ category: String) {
         print("Выбрана категория: \(category)")
     }

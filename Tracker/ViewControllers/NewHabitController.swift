@@ -366,9 +366,9 @@ final class NewHabitController: UIViewController {
     }
     
     @objc private func categoryButtonTapped() {
-        let categoryController = CategoryListController()
+        let categoryController = CategoryListController(selectedCategory: selectedCategory)
         categoryController.delegate = self
-        print("\(#file):\(#line)] \(#function) ОТЛАДКА: Делегат CategoryListController установлен: \(categoryController.delegate != nil)")
+        print("\(#file):\(#line)] \(#function) ОТЛАДКА: Открытие списка категорий с выбранной категорией: \(String(describing: selectedCategory))")
         
         let navigationController = UINavigationController(rootViewController: categoryController)
         navigationController.modalPresentationStyle = .automatic

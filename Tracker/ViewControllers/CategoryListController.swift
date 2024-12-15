@@ -78,6 +78,16 @@ final class CategoryListController: UIViewController {
         tableView.frame.size.height = totalHeight
     }
     
+    init(selectedCategory: String?) {
+        self.selectedCategory = selectedCategory
+        super.init(nibName: nil, bundle: nil)
+        print("\(#file):\(#line)] \(#function) Инициализирован с категорией: \(String(describing: selectedCategory))")
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Setup
     
     private func setupViews() {
@@ -181,39 +191,68 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = categories[indexPath.row]
-        cell.backgroundColor = .white
-        cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
-        cell.selectionStyle = .none
-        cell.contentView.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
-        cell.preservesSuperviewLayoutMargins = false
-        
-        if let textLabel = cell.textLabel {
-            textLabel.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                textLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
-                textLabel.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: 16),
-                textLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -16)
-            ])
-        }
-        let heightConstraint = cell.contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 75)
-        heightConstraint.priority = .defaultHigh
-        heightConstraint.isActive = true
-        if indexPath.row == categories.count - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: tableView.bounds.width, bottom: 0, right: 0)
-        } else {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        }
-        print("\(#file):\(#line)] \(#function) Настроена ячейка категории: \(categories[indexPath.row]) для строки \(indexPath.row)")
-        return cell
-    }
+         let category = categories[indexPath.row]
+         
+         cell.textLabel?.text = category
+         if let textLabel = cell.textLabel {
+             textLabel.translatesAutoresizingMaskIntoConstraints = false
+             NSLayoutConstraint.activate([
+                 textLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+                 textLabel.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: 16),
+                 textLabel.trailingAnchor.constraint(lessThanOrEqualTo: cell.contentView.trailingAnchor, constant: -40)
+             ])
+             print("\(#file):\(#line)] \(#function) Настроены констрейнты для textLabel категории: \(category)")
+         }
+         
+         cell.backgroundColor = .white
+         cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
+         cell.selectionStyle = .none
+         
+         guard let checkmarkImage = UIImage(systemName: "checkmark") else {
+             print("\(#file):\(#line)] \(#function) Ошибка: не удалось создать изображение галочки")
+             return cell
+         }
+         
+         let checkmark: UIImageView
+         if let existingCheckmark = cell.contentView.subviews.first(where: { $0 is UIImageView }) as? UIImageView {
+             checkmark = existingCheckmark
+             print("\(#file):\(#line)] \(#function) Найдена существующая галочка в ячейке")
+         } else {
+             checkmark = UIImageView(image: checkmarkImage)
+             checkmark.tintColor = .blue
+             checkmark.translatesAutoresizingMaskIntoConstraints = false
+             cell.contentView.addSubview(checkmark)
+             
+             NSLayoutConstraint.activate([
+                 checkmark.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+                 checkmark.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -16)
+             ])
+             print("\(#file):\(#line)] \(#function) Создана новая галочка для ячейки")
+         }
+         
+         checkmark.isHidden = category != selectedCategory
+         
+         let heightConstraint = cell.contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 75)
+         heightConstraint.priority = .defaultHigh
+         heightConstraint.isActive = true
+         
+         if indexPath.row == categories.count - 1 {
+             cell.separatorInset = UIEdgeInsets(top: 0, left: tableView.bounds.width, bottom: 0, right: 0)
+         } else {
+             cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+         }
+         
+         return cell
+     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCategory = categories[indexPath.row]
-        delegate?.didSelectCategory(selectedCategory)
-        delegate?.didUpdateCategories(categories)
-        print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
-        dismiss(animated: true)
+           self.selectedCategory = selectedCategory
+           tableView.reloadData()
+           delegate?.didSelectCategory(selectedCategory)
+           delegate?.didUpdateCategories(categories)
+           print("\(#file):\(#line)] \(#function) Выбрана категория: \(selectedCategory)")
+           dismiss(animated: true)
     }
 }
 
