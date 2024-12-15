@@ -21,7 +21,7 @@ final class TabBarController: UITabBarController {
         let trackers = UINavigationController(rootViewController: trackerNavigationController)
         
         let trackerText: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 12, weight: .medium)
+            .font: UIFont.systemFont(ofSize: 10, weight: .medium)
         ]
         trackers.tabBarItem = UITabBarItem(
             title: "Трекеры",
@@ -40,7 +40,7 @@ final class TabBarController: UITabBarController {
         
         viewControllers = [trackers, statistic]
         
-        tabBar.tintColor = .blue
+        tabBar.tintColor = UIColor(named: "tabBarTintColor")
         tabBar.backgroundColor = .white
         tabBar.layer.borderWidth = 0.5
         tabBar.layer.borderColor = UIColor.lightGray.cgColor
