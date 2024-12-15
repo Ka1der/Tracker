@@ -10,6 +10,7 @@ import UIKit
 final class NewScheduleController: UIViewController {
     
     // MARK: - Properties
+    
     private var selectedWeekDays: Set<WeekDay> = []
     weak var delegate: NewScheduleControllerDelegate?
     

@@ -59,6 +59,7 @@ final class TrackersViewController: UIViewController {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundImage = UIImage()
         searchBar.backgroundColor = .clear
+        searchBar.tintColor = .black
         return searchBar
     }()
     
@@ -176,7 +177,6 @@ final class TrackersViewController: UIViewController {
         let dateBarButton = UIBarButtonItem(customView: datePicker)
         navigationItem.leftBarButtonItem = addBarButton
         navigationItem.rightBarButtonItem = dateBarButton
-        print("\(#file):\(#line)] \(#function) Настроен NavigationBar с DatePicker")
     }
     
     private func setupPlaceholder() {
@@ -204,7 +204,6 @@ final class TrackersViewController: UIViewController {
         let calendar = Calendar.current
         let weekday = calendar.component(.weekday, from: date)
         let adjustedWeekday = WeekDay(rawValue: weekday == 1 ? 7 : weekday - 1) ?? .monday
-        print("\(#file):\(#line)] \(#function) Фильтрация для даты: \(date), день недели: \(adjustedWeekday.shortName)")
         let filteredCategories = categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
                 let isIrregularEvent = tracker.scheldue.count == 1 && tracker.creationDate != nil
@@ -219,10 +218,8 @@ final class TrackersViewController: UIViewController {
                     return isScheduledForToday
                 }
             }
-            
             return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
         }
-        print("\(#file):\(#line)] \(#function) Найдено после фильтрации: категорий - \(filteredCategories.count), трекеров - \(filteredCategories.reduce(0) { $0 + $1.trackers.count })")
         return filteredCategories
     }
     
@@ -384,8 +381,6 @@ extension TrackersViewController: NewHabitControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, category: String) {
         var newCategories = categories
         
-        print("\(#file):\(#line)] \(#function) Создание трекера \(tracker.title) в категории \(category)") // добавлен принт для отслеживания
-        
         if let index = categories.firstIndex(where: { $0.title == category }) {
             let existingCategory = categories[index]
             let newTrackers = existingCategory.trackers + [tracker]
@@ -429,19 +424,15 @@ extension TrackersViewController {
     
     func deleteTracker(at indexPath: IndexPath) {
         guard indexPath.section < filteredCategories.count else {
-            print("\(#file):\(#line)] \(#function) Ошибка: section \(indexPath.section) выходит за пределы filteredCategories (\(filteredCategories.count))")
             return
         }
-        
         guard indexPath.item < filteredCategories[indexPath.section].trackers.count else {
-            print("\(#file):\(#line)] \(#function) Ошибка: item \(indexPath.item) выходит за пределы trackers (\(filteredCategories[indexPath.section].trackers.count))")
             return
         }
         
         let filteredTracker = filteredCategories[indexPath.section].trackers[indexPath.item]
         guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategories[indexPath.section].title }),
               let trackerIndex = categories[categoryIndex].trackers.firstIndex(where: { $0.id == filteredTracker.id }) else {
-            print("\(#file):\(#line)] \(#function) Ошибка: не удалось найти соответствующий трекер в основном массиве")
             return
         }
         completedTrackers = completedTrackers.filter { $0.id != filteredTracker.id }
@@ -464,12 +455,9 @@ extension TrackersViewController {
 
 extension TrackersViewController: CategoryListControllerDelegate {
     func didSelectCategory(_ category: String) {
-        print("\(#file):\(#line)] \(#function) В TrackersViewController получена категория: \(category)")
-        print("\(#file):\(#line)] \(#function) Текущие категории: \(categories.map { $0.title })")
         if !categories.contains(where: { $0.title == category }) {
             createCategory(withTitle: category)
         }
-        print("\(#file):\(#line)] \(#function) После обработки категорий: \(categories.map { $0.title })")
     }
     
     func didUpdateCategories(_ categories: [String]) {

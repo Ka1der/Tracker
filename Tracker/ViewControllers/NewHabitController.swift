@@ -200,7 +200,6 @@ final class NewHabitController: UIViewController {
         view.addGestureRecognizer(tapGesture)
         nameTextField.delegate = self
         categoryButton.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
-        
     }
     
     override func viewDidLayoutSubviews() {
@@ -307,7 +306,6 @@ final class NewHabitController: UIViewController {
         let hasText = !text.isEmpty
         let hasSchedule = !schedule.isEmpty
         isFormValid = hasText && hasSchedule
-        print("\(#file):\(#line)] \(#function) Состояние формы - текст: \(hasText), расписание: \(hasSchedule)")
         
         if isFormValid {
             createButton.backgroundColor = .blackYPBlack
@@ -368,7 +366,6 @@ final class NewHabitController: UIViewController {
     @objc private func categoryButtonTapped() {
         let categoryController = CategoryListController(selectedCategory: selectedCategory)
         categoryController.delegate = self
-        print("\(#file):\(#line)] \(#function) ОТЛАДКА: Открытие списка категорий с выбранной категорией: \(String(describing: selectedCategory))")
         
         let navigationController = UINavigationController(rootViewController: categoryController)
         navigationController.modalPresentationStyle = .automatic
@@ -452,7 +449,6 @@ extension NewHabitController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
-        
         return true
     }
     

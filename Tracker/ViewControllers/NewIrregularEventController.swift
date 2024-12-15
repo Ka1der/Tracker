@@ -163,7 +163,6 @@ final class NewIrregularEventController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         [categoryButton].forEach { button in
             button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 40, bottom: 0, right: 16)
         }
@@ -224,7 +223,6 @@ final class NewIrregularEventController: UIViewController {
             createButton.widthAnchor.constraint(equalToConstant: 161),
             createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-        print("\(#file):\(#line)] \(#function) Настроен интерфейс IrregularEventViewController")
     }
     
     private func updateCreateButtonState() {
@@ -238,8 +236,6 @@ final class NewIrregularEventController: UIViewController {
         let hasText = !text.isEmpty
         let hasCategory = selectedCategory != nil
         isFormValid = hasText && hasCategory
-        
-        print("\(#file):\(#line)] \(#function) Состояние формы - текст: \(hasText), категория: \(hasCategory)")
         
         if isFormValid {
             createButton.backgroundColor = .blackYPBlack
@@ -282,7 +278,6 @@ final class NewIrregularEventController: UIViewController {
             isPinned: false,
             creationDate: Date()
         )
-        
         print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
         
         delegate?.didCreateTracker(newTracker, category: category)

@@ -110,21 +110,17 @@ extension NewCategoryController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
-        // Настройка ячейки
         cell.contentView.backgroundColor = UIColor(named: "backgroundGray")
         cell.backgroundColor = UIColor(named: "backgroundGray")
         cell.selectionStyle = .none
         
-        // Настройка текста
         cell.textLabel?.text = categories[indexPath.row]
         cell.textLabel?.font = .systemFont(ofSize: 17)
         cell.textLabel?.textColor = .black
         
-        // Отступы
         cell.contentView.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
         cell.preservesSuperviewLayoutMargins = false
         
-        // Скругление углов для первой и последней ячейки
         if indexPath.row == 0 {
             cell.layer.cornerRadius = 16
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
