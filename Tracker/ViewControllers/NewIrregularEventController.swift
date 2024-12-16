@@ -69,17 +69,15 @@ final class NewIrregularEventController: UIViewController {
         button.setTitle("Категория", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
-        
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
         button.tintColor = .gray
         button.backgroundColor = UIColor(named: "backgroundGray")
         button.layer.cornerRadius = 16
         button.titleLabel?.numberOfLines = 0
-        
         return button
     }()
     

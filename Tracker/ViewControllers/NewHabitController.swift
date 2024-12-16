@@ -191,6 +191,11 @@ final class NewHabitController: UIViewController {
         return gesture
     }()
     
+    private struct LayoutConstants {
+        static let buttonSpacing: CGFloat = 56
+        static let sideInset: CGFloat = 20
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -271,15 +276,15 @@ final class NewHabitController: UIViewController {
             //            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             //            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
             
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 56) / 2),
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            
-            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 56) / 2),
-            createButton.heightAnchor.constraint(equalToConstant: 60)
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: LayoutConstants.sideInset),
+                       cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+                       cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
+                       cancelButton.heightAnchor.constraint(equalToConstant: 60),
+                       
+                       createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -LayoutConstants.sideInset),
+                       createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+                       createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
+                       createButton.heightAnchor.constraint(equalToConstant: 60)
         ])
         
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
@@ -287,8 +292,7 @@ final class NewHabitController: UIViewController {
             button.setImage(chevronImage, for: .normal)
             button.tintColor = .gray
             button.contentHorizontalAlignment = .left
-            button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
             button.imageView?.contentMode = .right
             button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
         }
