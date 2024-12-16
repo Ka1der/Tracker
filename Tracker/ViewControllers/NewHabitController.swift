@@ -158,7 +158,7 @@ final class NewHabitController: UIViewController {
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
-        label.font = .systemFont(ofSize: 19, weight: .medium)
+        label.font = .systemFont(ofSize: 16, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

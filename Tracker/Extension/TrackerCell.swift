@@ -52,14 +52,15 @@ final class TrackerCell: UICollectionViewCell {
     }()
     
     private lazy var completeButton: UIButton = {
-        let button = UIButton(type: .system)
-        let largeConfig = UIImage.SymbolConfiguration(pointSize: 34, weight: .medium, scale: .medium)
-        let image = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)
-        button.setImage(image, for: .normal)
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.tintColor = .white
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .clear
+        button.layer.cornerRadius = 17
+        button.layer.masksToBounds = true
+        button.layer.borderWidth = 1
         button.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -72,9 +73,14 @@ final class TrackerCell: UICollectionViewCell {
     
     // MARK: - Lifecycle
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupViews()
+        print("\(#file):\(#line)] \(#function) Инициализация TrackerCell")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Setup Methods
@@ -113,8 +119,6 @@ final class TrackerCell: UICollectionViewCell {
             counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             counterLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
         ])
-        print("\(#file):\(#line)] \(#function) Обновлено положение заголовка трекера")
-        print("\(#file):\(#line)] \(#function) Размеры кнопки: frame = \(completeButton.frame), bounds = \(completeButton.bounds)")
     }
     
     // MARK: - Actions
@@ -149,18 +153,21 @@ final class TrackerCell: UICollectionViewCell {
     // MARK: - Public Methods
     
     func setCompletedState(_ isCompleted: Bool) {
-        let largeConfig = UIImage.SymbolConfiguration(pointSize: 34, weight: .medium, scale: .medium)
-        let imageName = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
-        let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
-        completeButton.setImage(image, for: .normal)
-        
         if isCompleted {
-            completeButton.alpha = 0.3
+            if let image = UIImage(named: "completedButtonCell") {
+                completeButton.setImage(image, for: .normal)
+                print("\(#file):\(#line)] \(#function) Установлено изображение completedButtonCell")
+            } else {
+                print("\(#file):\(#line)] \(#function) Ошибка загрузки изображения completedButtonCell")
+            }
         } else {
-            completeButton.alpha = 1.0
+            if let image = UIImage(systemName: "plus") {
+                completeButton.setImage(image, for: .normal)
+                print("\(#file):\(#line)] \(#function) Установлено системное изображение plus")
+            }
         }
-        
-        print("\(#file):\(#line)] \(#function) Обновлено состояние кнопки: \(isCompleted ? "выполнено" : "не выполнено")")
+        completeButton.alpha = isCompleted ? 0.3 : 1.0
+        print("\(#file):\(#line)] \(#function) Обновлено состояние кнопок: \(isCompleted ? "выполнено" : "не выполнено")")
     }
     
     func configureCompletionHandler(
@@ -183,11 +190,11 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         emojiLabel.text = tracker.emoji
         cardView.backgroundColor = tracker.color
-        completeButton.tintColor = tracker.color
+        completeButton.backgroundColor = tracker.color
+        completeButton.layer.borderColor = tracker.color.cgColor
+        completeButton.tintColor = .white
         counterLabel.text = "\(completedDaysCount) дней"
         setCompletedState(isCompleted)
-        
-        print("\(#file):\(#line)] \(#function) Настройка ячейки трекера: \(tracker.title), дата: \(currentDate)")
     }
 }
 
