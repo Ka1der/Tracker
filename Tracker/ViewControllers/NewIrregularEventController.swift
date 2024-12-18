@@ -14,31 +14,8 @@ final class NewIrregularEventController: UIViewController {
     private var selectedCategory: String?
     private var isFormValid: Bool = false
     weak var delegate: NewHabitControllerDelegate?
-    
-    private let colors: [UIColor] = [
-        .systemRed,
-        .systemOrange,
-        .systemBlue,
-        .systemPurple,
-        .systemGreen,
-        .systemPink,
-        .systemRed.withAlphaComponent(0.3),
-        .systemBlue.withAlphaComponent(0.3),
-        .systemGreen.withAlphaComponent(0.3),
-        .systemPurple.withAlphaComponent(0.3),
-        .systemOrange.withAlphaComponent(0.3),
-        .systemPink.withAlphaComponent(0.3),
-        .systemOrange.withAlphaComponent(0.6),
-        .systemBlue.withAlphaComponent(0.6),
-        .systemPurple.withAlphaComponent(0.6),
-        .systemPurple.withAlphaComponent(0.6),
-        .systemPurple.withAlphaComponent(0.6),
-        .systemGreen.withAlphaComponent(0.6)
-    ]
-    
-    private let emojis = ["😊", "🐱", "🎯", "🐶", "❤️", "😱",
-                          "😇", "😡", "🥶", "🤔", "🌟", "🍔",
-                          "🥦", "🏓", "🥇", "🎸", "🌴", "😭"]
+    private let emojis = EmojiStorage()
+    private let colors = ColorsStorage()
     
     // MARK: - UI Elements
     
@@ -174,10 +151,10 @@ final class NewIrregularEventController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(nameTextField)
         view.addSubview(categoryButton)
-        //        view.addSubview(emojiLabel)
-        //        view.addSubview(emojiCollectionView)
-        //        view.addSubview(colorLabel)
-        //        view.addSubview(colorCollectionView)
+        view.addSubview(emojiLabel)
+        view.addSubview(emojiCollectionView)
+        view.addSubview(colorLabel)
+        view.addSubview(colorCollectionView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
@@ -195,21 +172,21 @@ final class NewIrregularEventController: UIViewController {
             categoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
             
-            //            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
-            //            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            //
-            //            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
-            //            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            //            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            //            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
-            //
-            //            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
-            //            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            //
-            //            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
-            //            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            //            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            //            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            emojiLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
+            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            
+            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            
+            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            
+            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
+            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
@@ -297,20 +274,20 @@ final class NewIrregularEventController: UIViewController {
 extension NewIrregularEventController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
-            return emojis.count
+            return emojis.emojis.count
         } else {
-            return colors.count
+            return colors.colors.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! TrackerEmojiCell
-            cell.configure(with: emojis[indexPath.item])
+            cell.configure(with: emojis.emojis[indexPath.item])
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! TrackerColorCell
-            cell.configure(with: colors[indexPath.item])
+            cell.configure(with: colors.colors[indexPath.item])
             return cell
         }
     }
