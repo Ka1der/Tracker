@@ -128,6 +128,14 @@ final class NewIrregularEventController: UIViewController {
         return button
     }()
     
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = true
+        return scrollView
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -148,19 +156,27 @@ final class NewIrregularEventController: UIViewController {
     private func setupViews() {
         view.backgroundColor = .white
         
-        view.addSubview(titleLabel)
-        view.addSubview(nameTextField)
-        view.addSubview(categoryButton)
-        view.addSubview(emojiLabel)
-        view.addSubview(emojiCollectionView)
-        view.addSubview(colorLabel)
-        view.addSubview(colorCollectionView)
+        view.addSubview(scrollView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
+        scrollView.addSubview(titleLabel)
+        scrollView.addSubview(nameTextField)
+        scrollView.addSubview(categoryButton)
+        scrollView.addSubview(emojiLabel)
+        scrollView.addSubview(emojiCollectionView)
+        scrollView.addSubview(colorLabel)
+        scrollView.addSubview(colorCollectionView)
+        
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollView.contentLayoutGuide.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor, constant: -16),
+            
+            titleLabel.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 27),
+            titleLabel.centerXAnchor.constraint(equalTo: scrollView.contentLayoutGuide.centerXAnchor),
             
             nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -178,7 +194,7 @@ final class NewIrregularEventController: UIViewController {
             emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
             emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
             colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
@@ -186,7 +202,8 @@ final class NewIrregularEventController: UIViewController {
             colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
             colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            colorCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            colorCollectionView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),

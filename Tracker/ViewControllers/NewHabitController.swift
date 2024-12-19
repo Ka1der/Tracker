@@ -15,32 +15,6 @@ final class NewHabitController: UIViewController {
     private var schedule: Set<WeekDay> = []
     private var selectedCategory: String?
     private var isFormValid: Bool = false
-    
-//    private let colors: [UIColor] = [
-//        .systemRed,
-//        .systemOrange,
-//        .systemBlue,
-//        .systemPurple,
-//        .systemGreen,
-//        .systemPink,
-//        .systemRed.withAlphaComponent(0.3),
-//        .systemBlue.withAlphaComponent(0.3),
-//        .systemGreen.withAlphaComponent(0.3),
-//        .systemPurple.withAlphaComponent(0.3),
-//        .systemOrange.withAlphaComponent(0.3),
-//        .systemPink.withAlphaComponent(0.3),
-//        .systemOrange.withAlphaComponent(0.6),
-//        .systemBlue.withAlphaComponent(0.6),
-//        .systemPurple.withAlphaComponent(0.6),
-//        .systemPurple.withAlphaComponent(0.6),
-//        .systemPurple.withAlphaComponent(0.6),
-//        .systemGreen.withAlphaComponent(0.6)
-//    ]
-//    
-//    private let emojis = ["😊", "🐱", "🎯", "🐶", "❤️", "😱",
-//                          "😇", "😡", "🥶", "🤔", "🌟", "🍔",
-//                          "🥦", "🏓", "🥇", "🎸", "🌴", "😭"]
-    
     private let emojis = EmojiStorage()
     private let colors = ColorsStorage()
     
@@ -78,11 +52,13 @@ final class NewHabitController: UIViewController {
                 .foregroundColor: UIColor.black])
         button.setAttributedTitle(attributedString, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
+        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: -24, bottom: 15, right: 0)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
+        button.backgroundColor = UIColor(named: "backgroundGray")
+        button.layer.cornerRadius = 16
         button.tintColor = .gray
         button.titleLabel?.numberOfLines = 0
         return button
@@ -93,14 +69,15 @@ final class NewHabitController: UIViewController {
         button.setTitle("Расписание", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.contentHorizontalAlignment = .left
-        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
+        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: -24, bottom: 15, right: 0)
         button.titleLabel?.numberOfLines = 0
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(scheduleButtonTapped), for: .touchUpInside)
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
+        button.backgroundColor = UIColor(named: "backgroundGray")
+        button.layer.cornerRadius = 16
         button.tintColor = .gray
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
         return button
     }()
     
@@ -163,7 +140,7 @@ final class NewHabitController: UIViewController {
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -171,7 +148,7 @@ final class NewHabitController: UIViewController {
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
         label.text = "Цвет"
-        label.font = .systemFont(ofSize: 19, weight: .medium)
+        label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -196,6 +173,14 @@ final class NewHabitController: UIViewController {
         return gesture
     }()
     
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = true
+        return scrollView
+    }()
+    
     private struct LayoutConstants {
         static let buttonSpacing: CGFloat = 56
         static let sideInset: CGFloat = 20
@@ -212,81 +197,77 @@ final class NewHabitController: UIViewController {
         categoryButton.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        [categoryButton, scheduleButton].forEach { button in
-            button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 40, bottom: 0, right: 16)
-        }
-    }
-    
     // MARK: - Setup Methods
     
     private func setupViews() {
-        view.addSubview(titleLabel)
-        view.addSubview(nameTextField)
-        view.addSubview(buttonsContainerView)
-        view.addSubview(emojiLabel)
-        view.addSubview(emojiCollectionView)
-        view.addSubview(colorLabel)
-        view.addSubview(colorCollectionView)
+        view.addSubview(scrollView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
-        buttonsContainerView.addSubview(categoryButton)
-        buttonsContainerView.addSubview(separatorView)
-        buttonsContainerView.addSubview(scheduleButton)
+        scrollView.addSubview(titleLabel)
+        scrollView.addSubview(nameTextField)
+        scrollView.addSubview(categoryButton)
+        scrollView.addSubview(scheduleButton)
+        scrollView.addSubview(separatorView)
+        scrollView.addSubview(emojiLabel)
+        scrollView.addSubview(emojiCollectionView)
+        scrollView.addSubview(colorLabel)
+        scrollView.addSubview(colorCollectionView)
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollView.contentLayoutGuide.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor, constant: -16),
             
-            nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
-            nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            titleLabel.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 27),
+            titleLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            
+            nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            nameTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            nameTextField.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),
             
-            buttonsContainerView.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 24),
-            buttonsContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            buttonsContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
-            categoryButton.topAnchor.constraint(equalTo: buttonsContainerView.topAnchor),
-            categoryButton.leadingAnchor.constraint(equalTo: buttonsContainerView.leadingAnchor),
-            categoryButton.trailingAnchor.constraint(equalTo: buttonsContainerView.trailingAnchor),
+            categoryButton.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 24),
+            categoryButton.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            categoryButton.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
             
-            separatorView.leadingAnchor.constraint(equalTo: buttonsContainerView.leadingAnchor, constant: 16),
-            separatorView.trailingAnchor.constraint(equalTo: buttonsContainerView.trailingAnchor, constant: -16),
             separatorView.topAnchor.constraint(equalTo: categoryButton.bottomAnchor),
+            separatorView.leadingAnchor.constraint(equalTo: categoryButton.leadingAnchor, constant: 16),
+            separatorView.trailingAnchor.constraint(equalTo: categoryButton.trailingAnchor, constant: -16),
             separatorView.heightAnchor.constraint(equalToConstant: 0.5),
             
             scheduleButton.topAnchor.constraint(equalTo: separatorView.bottomAnchor),
-            scheduleButton.leadingAnchor.constraint(equalTo: buttonsContainerView.leadingAnchor),
-            scheduleButton.trailingAnchor.constraint(equalTo: buttonsContainerView.trailingAnchor),
+            scheduleButton.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            scheduleButton.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
             scheduleButton.heightAnchor.constraint(equalToConstant: 75),
-            scheduleButton.bottomAnchor.constraint(equalTo: buttonsContainerView.bottomAnchor),
             
             emojiLabel.topAnchor.constraint(equalTo: scheduleButton.bottomAnchor, constant: 32),
-            emojiLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            emojiLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 28),
             
             emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 0),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
-            colorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            colorLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 28),
+            colorLabel.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: -30),
             
-            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
-            colorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            colorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            colorCollectionView.heightAnchor.constraint(equalToConstant: 156),
+            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 0),
+            colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            colorCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            colorCollectionView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: LayoutConstants.sideInset),
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
-            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -LayoutConstants.sideInset),
+            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
             createButton.heightAnchor.constraint(equalToConstant: 60)
@@ -297,9 +278,9 @@ final class NewHabitController: UIViewController {
             button.setImage(chevronImage, for: .normal)
             button.tintColor = .gray
             button.contentHorizontalAlignment = .left
-            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
+            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 1, bottom: 0, right: 0)
             button.imageView?.contentMode = .right
-            button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 32, bottom: 0, right: 16)
+            button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 8, bottom: 0, right: 8)
         }
     }
     
