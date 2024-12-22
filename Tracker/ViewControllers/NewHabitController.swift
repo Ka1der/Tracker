@@ -17,6 +17,8 @@ final class NewHabitController: UIViewController {
     private var isFormValid: Bool = false
     private let emojis = EmojiStorage()
     private let colors = ColorsStorage()
+    private var selectedEmoji: [IndexPath] = []
+    private var selectedColor: [IndexPath] = []
     
     // MARK: - UI Elements
     
@@ -170,6 +172,7 @@ final class NewHabitController: UIViewController {
     
     private lazy var tapGesture: UITapGestureRecognizer = {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        gesture.cancelsTouchesInView = false
         return gesture
     }()
     
@@ -254,7 +257,6 @@ final class NewHabitController: UIViewController {
             
             colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
             colorLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 28),
-            colorLabel.bottomAnchor.constraint(equalTo: colorCollectionView.topAnchor, constant: -30),
             
             colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 0),
             colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -349,8 +351,12 @@ final class NewHabitController: UIViewController {
     }
     
     @objc private func hideKeyboard() {
-        view.endEditing(true)
-        print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
+        if view.isFirstResponder || view.subviews.contains(where: { $0.isFirstResponder }) {
+            view.endEditing(true)
+            print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
+        } else {
+            print("\(#file):\(#line)] \(#function) Клавиатура не активна, действие пропущено")
+        }
     }
     
     @objc private func categoryButtonTapped() {
@@ -400,6 +406,7 @@ extension NewHabitController: NewScheduleControllerDelegate {
 
 // MARK: - UICollectionViewDelegate & DataSource
 
+// Настройка collectionView
 extension NewHabitController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
@@ -418,6 +425,14 @@ extension NewHabitController: UICollectionViewDelegate, UICollectionViewDataSour
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! TrackerColorCell
             cell.configure(with: colors.colors[indexPath.item])
             return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == emojiCollectionView {
+            print("Выбран Emoji: \(emojis.emojis[indexPath.item])")
+        } else if collectionView == colorCollectionView {
+            print("Выбран Цвет: \(colors.colors[indexPath.item])")
         }
     }
 }

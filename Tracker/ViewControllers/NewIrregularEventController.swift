@@ -308,6 +308,14 @@ extension NewIrregularEventController: UICollectionViewDelegate, UICollectionVie
             return cell
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == emojiCollectionView {
+            print("Выбран Emoji: \(emojis.emojis[indexPath.item])")
+        } else if collectionView == colorCollectionView {
+            print("Выбран Цвет: \(colors.colors[indexPath.item])")
+        }
+    }
 }
 
 extension NewIrregularEventController: CategoryListControllerDelegate {
