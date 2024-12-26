@@ -203,6 +203,14 @@ final class NewHabitController: UIViewController {
     // MARK: - Setup Methods
     
     private func setupViews() {
+        setupSubView()
+        setupScrollView()
+        setupChevron()    
+    }
+    
+    // MARK: - Private Func
+    
+    private func setupSubView() {
         view.addSubview(scrollView)
         view.addSubview(cancelButton)
         view.addSubview(createButton)
@@ -216,7 +224,9 @@ final class NewHabitController: UIViewController {
         scrollView.addSubview(emojiCollectionView)
         scrollView.addSubview(colorLabel)
         scrollView.addSubview(colorCollectionView)
-        
+    }
+    
+    private func setupScrollView() {
         NSLayoutConstraint.activate([
             scrollView.contentLayoutGuide.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -262,19 +272,25 @@ final class NewHabitController: UIViewController {
             colorCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             colorCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             colorCollectionView.heightAnchor.constraint(equalToConstant: 204),
-            colorCollectionView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            
-            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
-            createButton.heightAnchor.constraint(equalToConstant: 60)
+            colorCollectionView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
+    }
+
+private func setupButtons() {
+    NSLayoutConstraint.activate([
+        cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+        cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        cancelButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
+        cancelButton.heightAnchor.constraint(equalToConstant: 60),
         
+        createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+        createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        createButton.widthAnchor.constraint(equalToConstant: (view.frame.width - LayoutConstants.buttonSpacing) / 2),
+        createButton.heightAnchor.constraint(equalToConstant: 60)
+    ])
+}
+    
+    private func setupChevron() {
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         [categoryButton, scheduleButton].forEach { button in
             button.setImage(chevronImage, for: .normal)
@@ -285,89 +301,87 @@ final class NewHabitController: UIViewController {
             button.imageEdgeInsets = UIEdgeInsets(top: 0, left: button.bounds.width - 8, bottom: 0, right: 8)
         }
     }
+
+private func updateCreateButtonState() {
+    guard let text = nameTextField.text else {
+        createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+        createButton.isEnabled = false
+        print("\(#file):\(#line)] \(#function) TextField.text == nil")
+        return
+    }
+    let hasText = !text.isEmpty
+    let hasSchedule = !schedule.isEmpty
+    isFormValid = hasText && hasSchedule
     
-    // MARK: - Private Func
-    
-    private func updateCreateButtonState() {
-        guard let text = nameTextField.text else {
-            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
-            createButton.isEnabled = false
-            print("\(#file):\(#line)] \(#function) TextField.text == nil")
-            return
-        }
-        let hasText = !text.isEmpty
-        let hasSchedule = !schedule.isEmpty
-        isFormValid = hasText && hasSchedule
-        
-        if isFormValid {
-            createButton.backgroundColor = .blackYPBlack
-            createButton.isEnabled = true
-        } else {
-            createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
-            createButton.isEnabled = false
-        }
+    if isFormValid {
+        createButton.backgroundColor = .blackYPBlack
+        createButton.isEnabled = true
+    } else {
+        createButton.backgroundColor = UIColor(named: "backgroundButtonColor")
+        createButton.isEnabled = false
+    }
+}
+
+// MARK: - Actions
+
+@objc private func cancelButtonTapped() {
+    dismiss(animated: true)
+    print("\(#file):\(#line)] \(#function) Нажата кнопка Отменить")
+}
+
+@objc private func createButtonTapped() {
+    guard let title = nameTextField.text, !title.isEmpty else {
+        print("\(#file):\(#line)] \(#function) Ошибка: пустое название трекера")
+        return
     }
     
-    // MARK: - Actions
-    
-    @objc private func cancelButtonTapped() {
-        dismiss(animated: true)
-        print("\(#file):\(#line)] \(#function) Нажата кнопка Отменить")
+    guard !schedule.isEmpty else {
+        print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
+        return
     }
     
-    @objc private func createButtonTapped() {
-        guard let title = nameTextField.text, !title.isEmpty else {
-            print("\(#file):\(#line)] \(#function) Ошибка: пустое название трекера")
-            return
-        }
-        
-        guard !schedule.isEmpty else {
-            print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
-            return
-        }
-        
-        let newTracker = Tracker(
-            id: UUID(),
-            title: title,
-            color: .systemBlue,
-            emoji: "📝",
-            scheldue: schedule,
-            isPinned: false,
-            creationDate: nil
-        )
-        
-        let category = selectedCategory ?? "Важное"
-        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
-        
-        delegate?.didCreateTracker(newTracker, category: category)
-        dismiss(animated: true)
-    }
+    let newTracker = Tracker(
+        id: UUID(),
+        title: title,
+        color: .systemBlue,
+        emoji: "📝",
+        scheldue: schedule,
+        isPinned: false,
+        creationDate: nil
+    )
     
-    @objc private func scheduleButtonTapped() {
-        let scheduleController = NewScheduleController()
-        scheduleController.delegate = self
-        print("\(#file):\(#line)] \(#function) Переход к выбору расписания")
-        present(scheduleController, animated: true)
-    }
+    let category = selectedCategory ?? "Важное"
+    print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
     
-    @objc private func hideKeyboard() {
-        if view.isFirstResponder || view.subviews.contains(where: { $0.isFirstResponder }) {
-            view.endEditing(true)
-            print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
-        } else {
-            print("\(#file):\(#line)] \(#function) Клавиатура не активна, действие пропущено")
-        }
+    delegate?.didCreateTracker(newTracker, category: category)
+    dismiss(animated: true)
+}
+
+@objc private func scheduleButtonTapped() {
+    let scheduleController = NewScheduleController()
+    scheduleController.delegate = self
+    print("\(#file):\(#line)] \(#function) Переход к выбору расписания")
+    present(scheduleController, animated: true)
+}
+
+@objc private func hideKeyboard() {
+    if view.isFirstResponder || view.subviews.contains(where: { $0.isFirstResponder }) {
+        view.endEditing(true)
+        print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
+    } else {
+        print("\(#file):\(#line)] \(#function) Клавиатура не активна, действие пропущено")
     }
+}
+
+@objc private func categoryButtonTapped() {
+    let categoryController = CategoryListController(selectedCategory: selectedCategory)
+    categoryController.delegate = self
     
-    @objc private func categoryButtonTapped() {
-        let categoryController = CategoryListController(selectedCategory: selectedCategory)
-        categoryController.delegate = self
-        
-        let navigationController = UINavigationController(rootViewController: categoryController)
-        navigationController.modalPresentationStyle = .automatic
-        print("\(#file):\(#line)] \(#function) Переход к выбору категории")
-        present(navigationController, animated: true)
-    }
+    let navigationController = UINavigationController(rootViewController: categoryController)
+    navigationController.modalPresentationStyle = .automatic
+    print("\(#file):\(#line)] \(#function) Переход к выбору категории")
+    present(navigationController, animated: true)
+}
 }
 
 // MARK: - NewScheduleControllerDelegate
