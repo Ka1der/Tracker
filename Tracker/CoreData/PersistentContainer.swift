@@ -8,16 +8,16 @@
 import Foundation
 import CoreData
 
-final class PersistantContainer {
+final class PersistentContainer {
     
     // MARK: - Singleton
     
-    static let shared = PersistantContainer()
+    static let shared = PersistentContainer()
     
     // MARK: - Persistent Container
     
     lazy var container: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Tracker")
+        let container = NSPersistentContainer(name: "TrackerStore")
         container.loadPersistentStores{ description, error in
             if let error = error as NSError? {
                 fatalError("Ошибка загрузки хранилища CoreData: \(error), \(error.userInfo)")
@@ -38,5 +38,21 @@ final class PersistantContainer {
     
     func newBackgroundContext() -> NSManagedObjectContext {
         return container.newBackgroundContext()
+    }
+    
+    // MARK: - Save Context
+ 
+    func saveContext(context: NSManagedObjectContext? = nil) {
+        let contextToSave = context ?? viewContext
+        
+        guard contextToSave.hasChanges else { return }
+        
+        do {
+            try contextToSave.save()
+            print("Context успешно сохранен")
+        } catch {
+            let nserror = error as NSError
+            print("Ошибка сохранения контекста: \(nserror), \(nserror.userInfo)")
+        }
     }
 }
