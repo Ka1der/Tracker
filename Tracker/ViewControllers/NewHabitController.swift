@@ -194,13 +194,11 @@ final class NewHabitController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("\(#file):\(#line)] \(#function) Начало загрузки экрана")
         view.backgroundColor = .white
         setupViews()
         view.addGestureRecognizer(tapGesture)
         nameTextField.delegate = self
         categoryButton.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
-        print("\(#file):\(#line)] \(#function) Завершение загрузки экрана")
     }
     
     // MARK: - Setup Methods
@@ -330,7 +328,6 @@ final class NewHabitController: UIViewController {
     
     @objc private func cancelButtonTapped() {
         dismiss(animated: true)
-        print("\(#file):\(#line)] \(#function) Нажата кнопка Отменить")
     }
     
     @objc private func createButtonTapped() {
@@ -375,17 +372,12 @@ final class NewHabitController: UIViewController {
     @objc private func scheduleButtonTapped() {
         let scheduleController = NewScheduleController()
         scheduleController.delegate = self
-        print("\(#file):\(#line)] \(#function) Переход к выбору расписания")
         present(scheduleController, animated: true)
     }
     
     @objc private func hideKeyboard() {
-        if view.isFirstResponder || view.subviews.contains(where: { $0.isFirstResponder }) {
-            view.endEditing(true)
-            print("\(#file):\(#line)] \(#function) Клавиатура скрыта")
-        } else {
-            print("\(#file):\(#line)] \(#function) Клавиатура не активна, действие пропущено")
-        }
+        view.endEditing(true)
+        print("\(#file):\(#line)] \(#function) Скрытие клавиатуры выполнено")
     }
     
     @objc private func categoryButtonTapped() {
@@ -476,12 +468,10 @@ extension NewHabitController: UITextFieldDelegate {
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
         updateCreateButtonState()
-        print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
         return true
     }
     

@@ -76,7 +76,6 @@ final class TrackerCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
-        print("\(#file):\(#line)] \(#function) Инициализация TrackerCell")
     }
     
     required init?(coder: NSCoder) {
@@ -156,18 +155,15 @@ final class TrackerCell: UICollectionViewCell {
         if isCompleted {
             if let image = UIImage(named: "completedButtonCell") {
                 completeButton.setImage(image, for: .normal)
-                print("\(#file):\(#line)] \(#function) Установлено изображение completedButtonCell")
             } else {
                 print("\(#file):\(#line)] \(#function) Ошибка загрузки изображения completedButtonCell")
             }
         } else {
             if let image = UIImage(systemName: "plus") {
                 completeButton.setImage(image, for: .normal)
-                print("\(#file):\(#line)] \(#function) Установлено системное изображение plus")
             }
         }
         completeButton.alpha = isCompleted ? 0.3 : 1.0
-        print("\(#file):\(#line)] \(#function) Обновлено состояние кнопок: \(isCompleted ? "выполнено" : "не выполнено")")
     }
     
     func configureCompletionHandler(

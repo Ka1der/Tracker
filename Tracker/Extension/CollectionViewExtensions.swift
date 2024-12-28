@@ -56,9 +56,6 @@ extension TrackersViewController: UICollectionViewDataSource {
                 self.addTrackerRecord(tracker, date: self.currentDate)
             }
         }
-        
-        print("\(#file):\(#line)] \(#function) Настройка ячейки для трекера: \(tracker.title), дата: \(currentDate)")
-        
         return cell
     }
     
@@ -88,9 +85,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             
             let title = filteredCategories[indexPath.section].title
             view.configure(with: title)
-            print("\(#file):\(#line)] \(#function) Настроен header с заголовком: \(title)")
             return view
-            
             
         case UICollectionView.elementKindSectionFooter:
             return UICollectionReusableView()
@@ -130,7 +125,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let size = CGSize(width: collectionView.frame.width, height: 18)
-        print("\(#file):\(#line)] \(#function) Размер хедера для секции \(section): \(size)")
         return size
     }
 }

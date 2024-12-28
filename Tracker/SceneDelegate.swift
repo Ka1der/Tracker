@@ -15,11 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             print("\(#file):\(#line)] \(#function) Ошибка: не удалось получить windowScene")
             return
         }
-        
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = TabBarController()
         window?.makeKeyAndVisible()
-        
-        print("\(#file):\(#line)] \(#function) Окно приложения успешно инициализировано")
     }
 }

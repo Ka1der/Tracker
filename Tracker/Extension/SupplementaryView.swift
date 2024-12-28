@@ -20,7 +20,6 @@ final class SupplementaryView: UICollectionReusableView {
     func configure(with title: String, color: UIColor = .black) {
         titleLabel.text = title
         titleLabel.textColor = color
-        print("\(#file):\(#line)] \(#function) Настройка заголовка секции: \(title), цвет: \(color)")
     }
     
     override init(frame: CGRect) {

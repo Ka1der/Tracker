@@ -19,13 +19,11 @@ final class TrackerCoreStore: NSObject {
     convenience override init() {
         let context = PersistentContainer.shared.viewContext
         self.init(context: context)
-        print("\(#file):\(#line)] \(#function) TrackerStore инициализирован с дефолтным контекстом")
     }
     
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
-        print("\(#file):\(#line)] \(#function) TrackerStore инициализирован с переданным контекстом")
     }
     
     // MARK: - Methods
@@ -79,7 +77,7 @@ final class TrackerCoreStore: NSObject {
             title: title,
             color: color,
             emoji: emoji,
-            schedule: WeekDay.decode(from: trackerCoreData.schedule), 
+            schedule: WeekDay.decode(from: trackerCoreData.schedule),
             isPinned: trackerCoreData.isPinned,
             creationDate: trackerCoreData.creationDate
         )
@@ -97,6 +95,26 @@ final class TrackerCoreStore: NSObject {
             return 0
         }
     }
+    
+    func deleteTrackersInCoreData(_ tracker: UUID) throws {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+    
+        fetchRequest.predicate = NSPredicate(format: "id == %@", tracker as CVarArg)
+           
+        do {
+              let trackers = try context.fetch(fetchRequest)
+              if let trackerToDelete = trackers.first {
+                  context.delete(trackerToDelete)
+                  try context.save()
+                  print("\(#file):\(#line)] \(#function) Трекер успешно удалён из CoreData: \(tracker)")
+              } else {
+                  print("\(#file):\(#line)] \(#function) Трекер не найден в CoreData: \(tracker)")
+              }
+          } catch {
+              print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
+              throw error
+         }
+     }
 }
 
 // MARK: - Errors
