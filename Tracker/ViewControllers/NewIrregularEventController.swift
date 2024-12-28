@@ -270,10 +270,18 @@ final class NewIrregularEventController: UIViewController {
             isPinned: false,
             creationDate: Date()
         )
-        print("\(#file):\(#line)] \(#function) Создаем трекер: название - '\(title)', категория - '\(category)'")
         
-        delegate?.didCreateTracker(newTracker, category: category)
-        dismiss(animated: true)
+        let trackerCategory = TrackerCategory(title: category, trackers: [newTracker])
+        let trackersCoreStore = TrackerCoreStore()
+        
+        do {
+            try trackersCoreStore.createTracker(newTracker, with: trackerCategory)
+            let trackerCount = trackersCoreStore.countTrackersInDatabase()
+            delegate?.didCreateTracker(newTracker, category: category)
+            dismiss(animated: true)
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
+        }
     }
     
     @objc private func categoryButtonTapped() {
