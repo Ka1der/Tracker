@@ -16,6 +16,7 @@ final class TrackersViewController: UIViewController {
     var categories: [TrackerCategory] = []
     var currentDate: Date = Date()
     var completedTrackers: Set<CompletedTrackerID> = []
+    private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -140,7 +141,7 @@ final class TrackersViewController: UIViewController {
         setupPlaceholder()
         setupCollectionView()
         updatePlaceholderVisibility()
-        loadTrackersFromCoreData()
+        loadTrackersFromStore()
         
         NotificationCenter.default.addObserver(
             self,
@@ -287,28 +288,14 @@ final class TrackersViewController: UIViewController {
         datePicker.calendar = calendar
     }
     
-    func showCategoryList(selectedCategory: String? = nil) {
-        let categoryListController = CategoryListController(selectedCategory: selectedCategory)
-        categoryListController.delegate = self
-        let navigationController = UINavigationController(rootViewController: categoryListController)
-        present(navigationController, animated: true)
-        print("\(#file):\(#line)] \(#function) Открыт список категорий с категорией: \(String(describing: selectedCategory))")
-    }
-    
-    func handleCategorySelection(_ category: String) {
-        print("Выбрана категория: \(category)")
-    }
-    
     @objc private func handleDataUpdate() {
-        loadTrackersFromCoreData()
+        loadTrackersFromStore()
     }
     
-    private func loadTrackersFromCoreData() {
-        
-        let trackerCoreStore = TrackerCoreStore()
+    private func loadTrackersFromStore() {
         
         do {
-            let loadedTrackers = try trackerCoreStore.fetchTrackers()
+            let loadedTrackers = try trackerStore.fetchTrackers()
             
             var categoriesDict: [String: [Tracker]] = [:]
             
@@ -488,32 +475,29 @@ extension TrackersViewController {
             print("\(#file):\(#line)] \(#function) Ошибка: категория не найдена \(filteredCategory.title)")
             return
         }
-        
-        let trackerCoreStore = TrackerCoreStore()
+    
         do {
-            try trackerCoreStore.deleteTrackersInCoreData(trackerToDelete.id)
-            
-            var updatedTrackers = categories[categoryIndex].trackers
-            if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == trackerToDelete.id }) {
-                updatedTrackers.remove(at: trackerIndex)
-                completedTrackers = completedTrackers.filter { $0.id != trackerToDelete.id }
-                
-                if updatedTrackers.isEmpty {
-                    categories.remove(at: categoryIndex)
-                    print("\(#file):\(#line)] \(#function) Категория удалена: \(filteredCategory.title)")
-                } else {
-                    categories[categoryIndex] = TrackerCategory(title: filteredCategory.title, trackers: updatedTrackers)
+            try trackerStore.deleteTracker(id: trackerToDelete.id)
+            if let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) {
+                var updatedTrackers = categories[categoryIndex].trackers
+                if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == trackerToDelete.id }) {
+                    updatedTrackers.remove(at: trackerIndex)
+                    completedTrackers = completedTrackers.filter { $0.id != trackerToDelete.id }
+                    
+                    if updatedTrackers.isEmpty {
+                        categories.remove(at: categoryIndex)
+                    } else {
+                        categories[categoryIndex] = TrackerCategory(title: filteredCategory.title, trackers: updatedTrackers)
+                    }
+                    
+                    filteredCategories = filterTrackersByDate(currentDate)
+                    print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
+                    collectionView.reloadData()
+                    updatePlaceholderVisibility()
                 }
-                
-                filteredCategories = filterTrackersByDate(currentDate)
-                print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
-                collectionView.reloadData()
-                updatePlaceholderVisibility()
-                let trackerCount = trackerCoreStore.countTrackersInDatabase()
-                print("\(#file):\(#line)] \(#function) Текущее количество трекеров в базе после удаления: \(trackerCount)")
             }
         } catch {
-            print("\(#file):\(#line)] \(#function) Какая-то хуйня при удалении трекера из CoreData: \(error)")
+            print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
         }
     }
 }

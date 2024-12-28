@@ -286,11 +286,11 @@ final class NewIrregularEventController: UIViewController {
         )
         
         let trackerCategory = TrackerCategory(title: category, trackers: [newTracker])
-        let trackersCoreStore = TrackerCoreStore()
+        let trackerStore: TrackerStoreProtocol = TrackerStore.shared
         
         do {
-            try trackersCoreStore.createTracker(newTracker, with: trackerCategory)
-            let trackerCount = trackersCoreStore.countTrackersInDatabase()
+            try trackerStore.createTracker(newTracker, category: trackerCategory)
+            let trackerCount = trackerStore.countTrackers()
             delegate?.didCreateTracker(newTracker, category: category)
             dismiss(animated: true)
         } catch {

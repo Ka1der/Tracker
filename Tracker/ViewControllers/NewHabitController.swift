@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 final class NewHabitController: UIViewController {
     
@@ -18,10 +17,9 @@ final class NewHabitController: UIViewController {
     private var isFormValid: Bool = false
     private let emojis = EmojiStorage()
     private let colors = ColorsStorage()
-    //    private var selectedEmoji: [IndexPath] = []
-    //    private var selectedColor: [IndexPath] = []
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
+    private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     
     // MARK: - UI Elements
     
@@ -368,21 +366,21 @@ final class NewHabitController: UIViewController {
             creationDate: nil
         )
         
-        let category = selectedCategory ?? "Важное"
-        let trackerCategory = TrackerCategory(title: category, trackers: [newTracker])
+        let categoryTitle = selectedCategory ?? "Важное"
+           let trackerCategory = TrackerCategory(
+               title: categoryTitle,
+               trackers: [newTracker]
+           )
         
         do {
-            try trackersCoreStore.createTracker(newTracker, with: trackerCategory)
-            print("\(#file):\(#line)] \(#function) Трекер сохранен в CoreData")
-            let trackerCount = trackersCoreStore.countTrackersInDatabase()
-            print("Количество трекеров в базе: \(trackerCount)")
-        } catch {
-            print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
-        }
-        
-        delegate?.didCreateTracker(newTracker, category: category)
-        dismiss(animated: true)
-    }
+            try trackerStore.createTracker(newTracker, category: trackerCategory)
+                  print("\(#file):\(#line)] \(#function) Трекер сохранен")
+                  delegate?.didCreateTracker(newTracker, category: categoryTitle)
+                  dismiss(animated: true)
+              } catch {
+                  print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
+              }
+          }
     
     @objc private func scheduleButtonTapped() {
         let scheduleController = NewScheduleController()

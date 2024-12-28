@@ -10,7 +10,7 @@ import CoreData
 
 final class TrackerStore {
     
-    static let shared = TrackerCoreStore()
+    static let shared: TrackerStoreProtocol = TrackerCoreStore()
     private let context: NSManagedObjectContext
     private let fetchedResultsDelegate = TrackerCoreStoreFetchedResultsControllerDelegate()
     

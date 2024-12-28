@@ -8,7 +8,7 @@
 import CoreData
 import UIKit
 
-final class TrackerCoreStore: NSObject {
+final class TrackerCoreStore: TrackerStoreProtocol {
     
     // MARK: - Properties
     
@@ -16,19 +16,13 @@ final class TrackerCoreStore: NSObject {
     
     // MARK: - Init
     
-    convenience override init() {
-        let context = PersistentContainer.shared.viewContext
-        self.init(context: context)
-    }
-    
-    init(context: NSManagedObjectContext) {
-        self.context = context
-        super.init()
-    }
+    init(context: NSManagedObjectContext = PersistentContainer.shared.viewContext) {
+           self.context = context
+       }
     
     // MARK: - Methods
     
-    func createTracker(_ tracker: Tracker, with category: TrackerCategory) throws {
+    func createTracker(_ tracker: Tracker, category: TrackerCategory) throws {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id
         trackerCoreData.title = tracker.title
@@ -50,16 +44,9 @@ final class TrackerCoreStore: NSObject {
     }
     
     func fetchTrackers() throws -> [Tracker] {
-        let request = TrackerCoreData.fetchRequest()
-        
-        do {
-            let trackersCoreData = try context.fetch(request)
-            return try trackersCoreData.map { try tracker(from: $0) }
-        } catch {
-            print("\(#file):\(#line)] \(#function) Ошибка загрузки трекеров: \(error)")
-            throw error
-        }
-    }
+          let request = TrackerCoreData.fetchRequest()
+          return try context.fetch(request).map { try tracker(from: $0) }
+      }
     
     // MARK: - Private methods
     
@@ -83,7 +70,7 @@ final class TrackerCoreStore: NSObject {
         )
     }
     
-    func countTrackersInDatabase() -> Int {
+    func countTrackers() -> Int {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         
         do {
@@ -96,26 +83,25 @@ final class TrackerCoreStore: NSObject {
         }
     }
     
-    func deleteTrackersInCoreData(_ tracker: UUID) throws {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-    
-        fetchRequest.predicate = NSPredicate(format: "id == %@", tracker as CVarArg)
-           
-        do {
-              let trackers = try context.fetch(fetchRequest)
-              if let trackerToDelete = trackers.first {
-                  context.delete(trackerToDelete)
-                  try context.save()
-                  print("\(#file):\(#line)] \(#function) Трекер успешно удалён из CoreData: \(tracker)")
-              } else {
-                  print("\(#file):\(#line)] \(#function) Трекер не найден в CoreData: \(tracker)")
-              }
-          } catch {
-              print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
-              throw error
-         }
-     }
-}
+    func deleteTracker(id: UUID) throws {
+           let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+           fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+              
+           do {
+               let trackers = try context.fetch(fetchRequest)
+               if let trackerToDelete = trackers.first {
+                   context.delete(trackerToDelete)
+                   try context.save()
+                   print("\(#file):\(#line)] \(#function) Трекер успешно удалён из CoreData: \(id)")
+               } else {
+                   print("\(#file):\(#line)] \(#function) Трекер не найден в CoreData: \(id)")
+               }
+           } catch {
+               print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
+               throw error
+           }
+       }
+   }
 
 // MARK: - Errors
 
