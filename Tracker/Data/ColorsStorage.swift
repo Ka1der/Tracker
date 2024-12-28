@@ -24,8 +24,8 @@ final class ColorsStorage {
         .systemOrange.withAlphaComponent(0.6),
         .systemBlue.withAlphaComponent(0.6),
         .systemPurple.withAlphaComponent(0.6),
-        .systemPurple.withAlphaComponent(0.6),
-        .systemPurple.withAlphaComponent(0.6),
+        .systemPurple.withAlphaComponent(0.7),
+        .systemPurple.withAlphaComponent(0.8),
         .systemGreen.withAlphaComponent(0.6)
     ]
     

@@ -16,6 +16,8 @@ final class NewIrregularEventController: UIViewController {
     weak var delegate: NewHabitControllerDelegate?
     private let emojis = EmojiStorage()
     private let colors = ColorsStorage()
+    private var selectedEmoji: String?
+    private var selectedColor: UIColor?
     
     // MARK: - UI Elements
     
@@ -227,7 +229,10 @@ final class NewIrregularEventController: UIViewController {
         
         let hasText = !text.isEmpty
         let hasCategory = selectedCategory != nil
-        isFormValid = hasText && hasCategory
+        let hasEmoji = selectedEmoji != nil
+        let hasColor = selectedColor != nil
+        
+        isFormValid = hasText && hasCategory && hasEmoji && hasColor
         
         if isFormValid {
             createButton.backgroundColor = .blackYPBlack
@@ -242,7 +247,6 @@ final class NewIrregularEventController: UIViewController {
     
     @objc private func cancelButtonTapped() {
         dismiss(animated: true)
-        print("\(#file):\(#line)] \(#function) Отмена создания нерегулярного события")
     }
     
     @objc private func createButtonTapped() {
@@ -256,6 +260,16 @@ final class NewIrregularEventController: UIViewController {
             return
         }
         
+        guard let emoji = selectedEmoji else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбран эмодзи")
+            return
+        }
+        
+        guard let color = selectedColor else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбран цвет")
+            return
+        }
+        
         let currentDate = Date()
         let calendar = Calendar.current
         let weekday = calendar.component(.weekday, from: currentDate)
@@ -264,8 +278,8 @@ final class NewIrregularEventController: UIViewController {
         let newTracker = Tracker(
             id: UUID(),
             title: title,
-            color: .systemRed,
-            emoji: "📝",
+            color: color,
+            emoji: emoji,
             schedule: [currentWeekDay],
             isPinned: false,
             creationDate: Date()
@@ -297,6 +311,7 @@ final class NewIrregularEventController: UIViewController {
 // MARK: - UICollectionViewDelegate & DataSource
 
 extension NewIrregularEventController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
             return emojis.emojis.count
@@ -319,10 +334,13 @@ extension NewIrregularEventController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollectionView {
-            print("Выбран Emoji: \(emojis.emojis[indexPath.item])")
+            selectedEmoji = emojis.emojis[indexPath.item]
+            print("\(#file):\(#line)] \(#function) Выбран эмодзи: \(selectedEmoji ?? "")")
         } else if collectionView == colorCollectionView {
-            print("Выбран Цвет: \(colors.colors[indexPath.item])")
+            selectedColor = colors.colors[indexPath.item]
+            print("\(#file):\(#line)] \(#function) Выбран цвет: \(selectedColor?.description ?? "")")
         }
+        updateCreateButtonState()
     }
 }
 
@@ -361,17 +379,14 @@ extension NewIrregularEventController: CategoryListControllerDelegate {
 extension NewIrregularEventController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         updateCreateButtonState()
-        print("\(#file):\(#line)] \(#function) Начато редактирование текста")
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
         updateCreateButtonState()
-        print("\(#file):\(#line)] \(#function) Изменен текст: \(textField.text ?? "")")
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        print("\(#file):\(#line)] \(#function) Клавиатура скрыта по нажатию Return")
         return true
     }
 }

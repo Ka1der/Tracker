@@ -18,8 +18,10 @@ final class NewHabitController: UIViewController {
     private var isFormValid: Bool = false
     private let emojis = EmojiStorage()
     private let colors = ColorsStorage()
-    private var selectedEmoji: [IndexPath] = []
-    private var selectedColor: [IndexPath] = []
+    //    private var selectedEmoji: [IndexPath] = []
+    //    private var selectedColor: [IndexPath] = []
+    private var selectedEmoji: String?
+    private var selectedColor: UIColor?
     
     // MARK: - UI Elements
     
@@ -313,7 +315,10 @@ final class NewHabitController: UIViewController {
         }
         let hasText = !text.isEmpty
         let hasSchedule = !schedule.isEmpty
-        isFormValid = hasText && hasSchedule
+        let hasEmoji = selectedEmoji != nil
+        let hasColor = selectedColor != nil
+        
+        isFormValid = hasText && hasSchedule && hasEmoji && hasColor
         
         if isFormValid {
             createButton.backgroundColor = .blackYPBlack
@@ -340,14 +345,24 @@ final class NewHabitController: UIViewController {
             print("\(#file):\(#line)] \(#function) Ошибка: не выбраны дни недели")
             return
         }
-    
+        
+        guard let emoji = selectedEmoji else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбран эмодзи")
+            return
+        }
+        
+        guard let color = selectedColor else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не выбран цвет")
+            return
+        }
+        
         let trackersCoreStore = TrackerCoreStore()
         
         let newTracker = Tracker(
             id: UUID(),
             title: title,
-            color: .systemBlue,
-            emoji: "📝",
+            color: color,
+            emoji: emoji,
             schedule: schedule,
             isPinned: false,
             creationDate: nil
@@ -363,7 +378,7 @@ final class NewHabitController: UIViewController {
             print("Количество трекеров в базе: \(trackerCount)")
         } catch {
             print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
-             }
+        }
         
         delegate?.didCreateTracker(newTracker, category: category)
         dismiss(animated: true)
@@ -377,7 +392,6 @@ final class NewHabitController: UIViewController {
     
     @objc private func hideKeyboard() {
         view.endEditing(true)
-        print("\(#file):\(#line)] \(#function) Скрытие клавиатуры выполнено")
     }
     
     @objc private func categoryButtonTapped() {
@@ -450,10 +464,14 @@ extension NewHabitController: UICollectionViewDelegate, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollectionView {
-            print("Выбран Emoji: \(emojis.emojis[indexPath.item])")
+            selectedEmoji = emojis.emojis[indexPath.item]
+            print("\(#file):\(#line)] \(#function) Выбран эмодзи: \(selectedEmoji ?? "")")
+            
         } else if collectionView == colorCollectionView {
-            print("Выбран Цвет: \(colors.colors[indexPath.item])")
+            selectedColor = colors.colors[indexPath.item]
+            print("\(#file):\(#line)] \(#function) Выбран цвет: \(selectedColor?.description ?? "")")
         }
+        updateCreateButtonState()
     }
 }
 
