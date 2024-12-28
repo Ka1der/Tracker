@@ -17,7 +17,7 @@ final class PersistentContainer {
     // MARK: - Persistent Container
     
     lazy var container: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "TrackerStore")
+        let container = NSPersistentContainer(name: "CoreDataTracker")
         container.loadPersistentStores{ description, error in
             if let error = error as NSError? {
                 fatalError("Ошибка загрузки хранилища CoreData: \(error), \(error.userInfo)")

@@ -16,6 +16,16 @@ enum WeekDay: Int, CaseIterable {
     case saturday
     case sunday
     
+    static func decode(from encoded: Int64) -> Set<WeekDay> {
+           var weekDays = Set<WeekDay>()
+           for day in WeekDay.allCases {
+               if (encoded & (1 << (day.rawValue - 1))) != 0 {
+                   weekDays.insert(day)
+               }
+           }
+           return weekDays
+       }
+    
     var shortName: String {
         switch self {
         case .monday: return "Понедельник"

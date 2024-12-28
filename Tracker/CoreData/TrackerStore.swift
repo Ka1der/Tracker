@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  TrackerStore
+//  TrackerStore.swift
+//  Tracker
 //
 //  Created by Kaider on 28.12.2024.
 //
@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-final class TrackerCoreStore {
+final class TrackerStore {
     
     static let shared = TrackerCoreStore()
     private let context: NSManagedObjectContext

@@ -140,6 +140,14 @@ final class TrackersViewController: UIViewController {
         setupPlaceholder()
         setupCollectionView()
         updatePlaceholderVisibility()
+        loadTrackersFromCoreData()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDataUpdate),
+            name: NSNotification.Name("TrackersDataDidChange"),
+            object: nil
+        )
     }
     
     // MARK: - Setup Methods
@@ -208,7 +216,7 @@ final class TrackersViewController: UIViewController {
         
         let filteredCategories = categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
-                let isIrregularEvent = tracker.scheldue.count == 1 && tracker.creationDate != nil
+                let isIrregularEvent = tracker.schedule.count == 1 && tracker.creationDate != nil
                 if isIrregularEvent {
                     let isCompletedInAnyDay = completedTrackers.contains { completedID in
                         completedID.id == tracker.id
@@ -224,7 +232,7 @@ final class TrackersViewController: UIViewController {
                         return true
                     }
                 } else {
-                    let isScheduledForToday = tracker.scheldue.contains(adjustedWeekday)
+                    let isScheduledForToday = tracker.schedule.contains(adjustedWeekday)
                     print("\(#file):\(#line)] \(#function) Регулярная привычка '\(tracker.title)': запланирована на \(adjustedWeekday.shortName), показывать: \(isScheduledForToday)")
                     return isScheduledForToday
                 }
@@ -289,6 +297,35 @@ final class TrackersViewController: UIViewController {
     
     func handleCategorySelection(_ category: String) {
         print("Выбрана категория: \(category)")
+    }
+    
+    @objc private func handleDataUpdate() {
+        loadTrackersFromCoreData()
+    }
+    
+    private func loadTrackersFromCoreData() {
+        
+        let trackerCoreStore = TrackerCoreStore()
+        
+        do {
+            let loadedTrackers = try trackerCoreStore.fetchTrackers()
+            
+            var categoriesDict: [String: [Tracker]] = [:]
+            
+            for tracker in loadedTrackers {
+                let categoryTitle = "Важное" // TODO: Позже добавить логику категорий
+                categoriesDict[categoryTitle, default: []].append(tracker)
+            }
+            categories = categoriesDict.map { TrackerCategory(title: $0.key, trackers: $0.value) }
+            filteredCategories = filterTrackersByDate(currentDate)
+            
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                self.updatePlaceholderVisibility()
+            }
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка загрузки трекеров: \(error)")
+        }
     }
     
     // MARK: - TrackerManagement

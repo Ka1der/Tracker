@@ -266,7 +266,7 @@ final class NewIrregularEventController: UIViewController {
             title: title,
             color: .systemRed,
             emoji: "📝",
-            scheldue: [currentWeekDay],
+            schedule: [currentWeekDay],
             isPinned: false,
             creationDate: Date()
         )

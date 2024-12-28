@@ -12,7 +12,7 @@ struct Tracker {
     let title: String
     let color: UIColor
     let emoji: String
-    let scheldue: Set<WeekDay>
+    let schedule: Set<WeekDay>
     let isPinned: Bool
     let creationDate: Date?
 }

@@ -1,5 +1,5 @@
 //
-//  TrackerStore.swift
+//  TrackerCoreStore.swift
 //  Tracker
 //
 //  Created by Kaider on 28.12.2024.
@@ -8,7 +8,7 @@
 import CoreData
 import UIKit
 
-final class TrackerStore: NSObject {
+final class TrackerCoreStore: NSObject {
     
     // MARK: - Properties
     
@@ -63,6 +63,8 @@ final class TrackerStore: NSObject {
         }
     }
     
+    // MARK: - Private methods
+    
     private func tracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
         guard let id = trackerCoreData.id,
               let title = trackerCoreData.title,
@@ -81,6 +83,19 @@ final class TrackerStore: NSObject {
             isPinned: trackerCoreData.isPinned,
             creationDate: trackerCoreData.creationDate
         )
+    }
+    
+    func countTrackersInDatabase() -> Int {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        
+        do {
+            let count = try context.count(for: fetchRequest)
+            print("Количество трекеров в базе данных: \(count)")
+            return count
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка подсчета трекеров в базе: \(error)")
+            return 0
+        }
     }
 }
 
