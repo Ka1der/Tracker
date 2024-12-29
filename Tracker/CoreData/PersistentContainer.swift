@@ -14,19 +14,22 @@ final class PersistentContainer {
     
     static let shared = PersistentContainer()
     
-    // MARK: - Persistent Container
-    
-    lazy var container: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "CoreDataTracker")
+    private init() {
         container.loadPersistentStores{ description, error in
             if let error = error as NSError? {
-                fatalError("Ошибка загрузки хранилища CoreData: \(error), \(error.userInfo)")
+                print("\(#file):\(#line)] \(#function) Ошибка загрузки хранилища CoreData: \(error), \(error.userInfo)")
             } else {
-                print("Хранилище CoreData успешно загружено")
+                print("\(#file):\(#line)] \(#function) Хранилище CoreData успешно загружено")
             }
         }
-        return container
-    }()
+    }
+    
+    // MARK: - Persistent Container
+    
+    private lazy var container: NSPersistentContainer = {
+         let container = NSPersistentContainer(name: "CoreDataTracker")
+         return container
+     }()
     
     // MARK: - View Context
     

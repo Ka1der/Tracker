@@ -7,7 +7,7 @@
 
 import CoreData
 
-class TrackerCoreStoreFetchedResultsControllerDelegate: NSObject, NSFetchedResultsControllerDelegate {
+final class TrackerCoreStoreFetchedResultsControllerDelegate: NSObject, NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         NotificationCenter.default.post(
             name: NSNotification.Name("TrackersDataDidChange"),
