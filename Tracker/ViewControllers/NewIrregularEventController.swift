@@ -322,11 +322,23 @@ extension NewIrregularEventController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! TrackerEmojiCell
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "EmojiCell",
+                for: indexPath
+            ) as? TrackerEmojiCell else {
+                print("\(#file):\(#line)] \(#function) Ошибка приведения типа для EmojiCell")
+                return UICollectionViewCell()
+            }
             cell.configure(with: emojis.emojis[indexPath.item])
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! TrackerColorCell
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "ColorCell",
+                for: indexPath
+            ) as? TrackerColorCell else {
+                print("\(#file):\(#line)] \(#function) Ошибка приведения типа для ColorCell")
+                return UICollectionViewCell()
+            }
             cell.configure(with: colors.colors[indexPath.item])
             return cell
         }
