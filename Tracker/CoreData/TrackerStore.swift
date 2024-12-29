@@ -5,7 +5,6 @@
 //  Created by Kaider on 28.12.2024.
 //
 
-import UIKit
 import CoreData
 
 final class TrackerStore {

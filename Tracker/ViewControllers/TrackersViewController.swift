@@ -17,6 +17,7 @@ final class TrackersViewController: UIViewController {
     var currentDate: Date = Date()
     var completedTrackers: Set<CompletedTrackerID> = []
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
+    private let trackerRecordStore = TrackerRecordStore()
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -142,6 +143,7 @@ final class TrackersViewController: UIViewController {
         setupCollectionView()
         updatePlaceholderVisibility()
         loadTrackersFromStore()
+        loadTrackerRecords()
         
         NotificationCenter.default.addObserver(
             self,
@@ -244,6 +246,16 @@ final class TrackersViewController: UIViewController {
         return filteredCategories
     }
     
+    private func loadTrackerRecords() {
+        do {
+            let records = try trackerRecordStore.fetchRecords()
+            completedTrackers = Set(records.map { CompletedTrackerID(id: $0.id, date: $0.date) })
+            print("\(#file):\(#line)] \(#function) Загружено записей: \(records.count)")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка загрузки записей трекеров: \(error)")
+        }
+    }
+    
     // MARK: - Actions
     
     @objc private func addButtonTapped() {
@@ -325,15 +337,27 @@ final class TrackersViewController: UIViewController {
     func addTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
         completedTrackers.insert(completedID)
-        print("\(#file):\(#line)] \(#function) Добавлен трекер: \(tracker.title) на дату: \(date)")
+        do {
+            let record = TrackerRecord(id: tracker.id, date: date)
+            try trackerRecordStore.addNewRecord(record)
+            print("\(#file):\(#line)] \(#function) Сохранена запись трекера: \(tracker.title)")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка сохранения записи трекера: \(error)")
+        }
+        
         collectionView.reloadData()
     }
     
     func removeTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
-        completedTrackers.remove(completedID)
-        print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title) с даты: \(date)")
-        collectionView.reloadData()
+        do {
+            try trackerRecordStore.deleteRecord(id: tracker.id, date: date)
+            completedTrackers.remove(completedID)
+            print("\(#file):\(#line)] \(#function) Успешно удалена запись трекера: \(tracker.title)")
+            collectionView.reloadData()
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка удаления записи трекера: \(error)")
+        }
     }
     
     func countCompletedDays(for tracker: Tracker) -> Int {
@@ -475,7 +499,7 @@ extension TrackersViewController {
             print("\(#file):\(#line)] \(#function) Ошибка: категория не найдена \(filteredCategory.title)")
             return
         }
-    
+        
         do {
             try trackerStore.deleteTracker(id: trackerToDelete.id)
             if let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) {
