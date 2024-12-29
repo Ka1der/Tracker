@@ -16,6 +16,8 @@ final class TrackersViewController: UIViewController {
     var categories: [TrackerCategory] = []
     var currentDate: Date = Date()
     var completedTrackers: Set<CompletedTrackerID> = []
+    private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
+    private let trackerRecordStore = TrackerRecordStore()
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -140,6 +142,15 @@ final class TrackersViewController: UIViewController {
         setupPlaceholder()
         setupCollectionView()
         updatePlaceholderVisibility()
+        loadTrackersFromStore()
+        loadTrackerRecords()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDataUpdate),
+            name: NSNotification.Name("TrackersDataDidChange"),
+            object: nil
+        )
     }
     
     // MARK: - Setup Methods
@@ -208,7 +219,7 @@ final class TrackersViewController: UIViewController {
         
         let filteredCategories = categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
-                let isIrregularEvent = tracker.scheldue.count == 1 && tracker.creationDate != nil
+                let isIrregularEvent = tracker.schedule.count == 1 && tracker.creationDate != nil
                 if isIrregularEvent {
                     let isCompletedInAnyDay = completedTrackers.contains { completedID in
                         completedID.id == tracker.id
@@ -224,7 +235,7 @@ final class TrackersViewController: UIViewController {
                         return true
                     }
                 } else {
-                    let isScheduledForToday = tracker.scheldue.contains(adjustedWeekday)
+                    let isScheduledForToday = tracker.schedule.contains(adjustedWeekday)
                     print("\(#file):\(#line)] \(#function) Регулярная привычка '\(tracker.title)': запланирована на \(adjustedWeekday.shortName), показывать: \(isScheduledForToday)")
                     return isScheduledForToday
                 }
@@ -233,6 +244,16 @@ final class TrackersViewController: UIViewController {
         }
         print("\(#file):\(#line)] \(#function) Найдено после фильтрации: категорий - \(filteredCategories.count), трекеров - \(filteredCategories.reduce(0) { $0 + $1.trackers.count })")
         return filteredCategories
+    }
+    
+    private func loadTrackerRecords() {
+        do {
+            let records = try trackerRecordStore.fetchRecords()
+            completedTrackers = Set(records.map { CompletedTrackerID(id: $0.id, date: $0.date) })
+            print("\(#file):\(#line)] \(#function) Загружено записей: \(records.count)")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка загрузки записей трекеров: \(error)")
+        }
     }
     
     // MARK: - Actions
@@ -279,16 +300,31 @@ final class TrackersViewController: UIViewController {
         datePicker.calendar = calendar
     }
     
-    func showCategoryList(selectedCategory: String? = nil) {
-        let categoryListController = CategoryListController(selectedCategory: selectedCategory)
-        categoryListController.delegate = self
-        let navigationController = UINavigationController(rootViewController: categoryListController)
-        present(navigationController, animated: true)
-        print("\(#file):\(#line)] \(#function) Открыт список категорий с категорией: \(String(describing: selectedCategory))")
+    @objc private func handleDataUpdate() {
+        loadTrackersFromStore()
     }
     
-    func handleCategorySelection(_ category: String) {
-        print("Выбрана категория: \(category)")
+    private func loadTrackersFromStore() {
+        
+        do {
+            let loadedTrackers = try trackerStore.fetchTrackers()
+            
+            var categoriesDict: [String: [Tracker]] = [:]
+            
+            for tracker in loadedTrackers {
+                let categoryTitle = "Важное" // TODO: Позже добавить логику категорий
+                categoriesDict[categoryTitle, default: []].append(tracker)
+            }
+            categories = categoriesDict.map { TrackerCategory(title: $0.key, trackers: $0.value) }
+            filteredCategories = filterTrackersByDate(currentDate)
+            
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                self.updatePlaceholderVisibility()
+            }
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка загрузки трекеров: \(error)")
+        }
     }
     
     // MARK: - TrackerManagement
@@ -301,15 +337,27 @@ final class TrackersViewController: UIViewController {
     func addTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
         completedTrackers.insert(completedID)
-        print("\(#file):\(#line)] \(#function) Добавлен трекер: \(tracker.title) на дату: \(date)")
+        do {
+            let record = TrackerRecord(id: tracker.id, date: date)
+            try trackerRecordStore.addNewRecord(record)
+            print("\(#file):\(#line)] \(#function) Сохранена запись трекера: \(tracker.title)")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка сохранения записи трекера: \(error)")
+        }
+        
         collectionView.reloadData()
     }
     
     func removeTrackerRecord(_ tracker: Tracker, date: Date) {
         let completedID = CompletedTrackerID(id: tracker.id, date: date)
-        completedTrackers.remove(completedID)
-        print("\(#file):\(#line)] \(#function) Удален трекер: \(tracker.title) с даты: \(date)")
-        collectionView.reloadData()
+        do {
+            try trackerRecordStore.deleteRecord(id: tracker.id, date: date)
+            completedTrackers.remove(completedID)
+            print("\(#file):\(#line)] \(#function) Успешно удалена запись трекера: \(tracker.title)")
+            collectionView.reloadData()
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка удаления записи трекера: \(error)")
+        }
     }
     
     func countCompletedDays(for tracker: Tracker) -> Int {
@@ -445,28 +493,35 @@ extension TrackersViewController {
             print("\(#file):\(#line)] \(#function) Ошибка: индекс трекера \(indexPath.item) выходит за пределы \(filteredCategory.trackers.count)")
             return
         }
+        
         let trackerToDelete = filteredCategory.trackers[indexPath.item]
         guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) else {
             print("\(#file):\(#line)] \(#function) Ошибка: категория не найдена \(filteredCategory.title)")
             return
         }
-        var updatedTrackers = categories[categoryIndex].trackers
-        if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == trackerToDelete.id }) {
-            updatedTrackers.remove(at: trackerIndex)
-            completedTrackers = completedTrackers.filter { $0.id != trackerToDelete.id }
-            
-            if updatedTrackers.isEmpty {
-                categories.remove(at: categoryIndex)
-                print("\(#file):\(#line)] \(#function) Категория удалена: \(filteredCategory.title)")
-            } else {
-                categories[categoryIndex] = TrackerCategory(title: filteredCategory.title, trackers: updatedTrackers)
+        
+        do {
+            try trackerStore.deleteTracker(id: trackerToDelete.id)
+            if let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) {
+                var updatedTrackers = categories[categoryIndex].trackers
+                if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == trackerToDelete.id }) {
+                    updatedTrackers.remove(at: trackerIndex)
+                    completedTrackers = completedTrackers.filter { $0.id != trackerToDelete.id }
+                    
+                    if updatedTrackers.isEmpty {
+                        categories.remove(at: categoryIndex)
+                    } else {
+                        categories[categoryIndex] = TrackerCategory(title: filteredCategory.title, trackers: updatedTrackers)
+                    }
+                    
+                    filteredCategories = filterTrackersByDate(currentDate)
+                    print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
+                    collectionView.reloadData()
+                    updatePlaceholderVisibility()
+                }
             }
-            filteredCategories = filterTrackersByDate(currentDate)
-            print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
-            collectionView.reloadData()
-            updatePlaceholderVisibility()
-        } else {
-            print("\(#file):\(#line)] \(#function) Ошибка: трекер не найден в категории")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
         }
     }
 }

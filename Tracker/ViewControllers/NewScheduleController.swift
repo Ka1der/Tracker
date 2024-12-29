@@ -131,6 +131,7 @@ final class NewScheduleController: UIViewController {
     }
     
     // MARK: - Actions
+    
     @objc private func switchChanged(_ sender: UISwitch) {
         guard let day = WeekDay(rawValue: sender.tag) else { return }
         
