@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class OnboardingViewController: UIViewController {
+final class OnboardingViewController: UIPageViewController {
     
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
