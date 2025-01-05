@@ -15,8 +15,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             print("\(#file):\(#line)] \(#function) Ошибка: не удалось получить windowScene")
             return
         }
+        
+        let isOnboardingCompleted = UserDefaults.standard.bool(forKey: "OnboardingCompleted")
+        print("\(#file):\(#line)] \(#function) Статус онбординга: \(isOnboardingCompleted)")
+        
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = OnboardingViewController()
+        
+        if isOnboardingCompleted {
+            window?.rootViewController = TabBarController()
+            print("\(#file):\(#line)] \(#function) Показываем главный экран")
+        } else {
+            window?.rootViewController = OnboardingViewController()
+            print("\(#file):\(#line)] \(#function) Показываем онбординг")
+        }
+        
         window?.makeKeyAndVisible()
     }
 }

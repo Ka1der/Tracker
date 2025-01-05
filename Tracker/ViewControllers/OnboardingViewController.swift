@@ -166,7 +166,6 @@ final class OnboardingViewController: UIPageViewController {
         UserDefaults.standard.set(true, forKey: "OnboardingCompleted")
         let tabBarController = TabBarController()
         tabBarController.modalPresentationStyle = .fullScreen
-        print("\(#file):\(#line)] \(#function) Переход к главному экрану")
         present(tabBarController, animated: true)
     }
 }
