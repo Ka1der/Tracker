@@ -254,37 +254,36 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
                 editController.delegate = self.delegate
                 let navigationController = UINavigationController(rootViewController: editController)
                 navigationController.modalPresentationStyle = .automatic
-                print("\(#file):\(#line)] \(#function) Переход к редактированию категории: \(category.title)")
                 self.present(navigationController, animated: true)
             }
+            
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive
+            ) { [weak self] _ in
+                let alert = UIAlertController(
+                    title: nil,
+                    message: "Уверены что хотите удалить категорию «\(category.title)»?",
+                    preferredStyle: .actionSheet
+                )
                 
-                let deleteAction = UIAction(
+                alert.addAction(UIAlertAction(
                     title: "Удалить",
-                    image: UIImage(systemName: "trash"),
-                    attributes: .destructive
-                ) { [weak self] _ in
-                    let alert = UIAlertController(
-                        title: nil,
-                        message: "Уверены что хотите удалить категорию «\(category.title)»?",
-                        preferredStyle: .actionSheet
-                    )
-                    
-                    alert.addAction(UIAlertAction(
-                        title: "Удалить",
-                        style: .destructive) { [weak self] _ in
-                            self?.viewModel.deleteCategory(title: category.title)
+                    style: .destructive) { [weak self] _ in
+                        self?.viewModel.deleteCategory(title: category.title)
                     })
-                    
-                    alert.addAction(UIAlertAction(
-                        title: "Отменить",
-                        style: .cancel
-                    ))
-                    
-                    self?.present(alert, animated: true)
-                }
-                return UIMenu(children: [editAction, deleteAction])
+                
+                alert.addAction(UIAlertAction(
+                    title: "Отменить",
+                    style: .cancel
+                ))
+                
+                self?.present(alert, animated: true)
             }
+            return UIMenu(children: [editAction, deleteAction])
         }
+    }
     
     private func dismissAll() {
         guard let presentingVC = presentingViewController as? UINavigationController,

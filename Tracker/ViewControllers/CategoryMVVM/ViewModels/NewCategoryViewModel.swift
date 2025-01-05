@@ -25,7 +25,6 @@ final class NewCategoryViewModel {
     
     init(trackerCategoryStore: TrackerCategoryStore = TrackerCategoryStore()) {
         self.trackerCategoryStore = trackerCategoryStore
-        print("\(#file):\(#line)] \(#function) NewCategoryViewModel инициализирована")
     }
     
     // MARK: - Methods
@@ -33,7 +32,6 @@ final class NewCategoryViewModel {
     func validateInput(_ text: String?) {
         let isValid = text?.isEmpty == false
         onValidationChanged?(isValid)
-        print("\(#file):\(#line)] \(#function) Результат валидации: \(isValid)")
     }
     
     func createCategory(title: String) {

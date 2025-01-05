@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class CategoryListViewModel {
+final class CategoryListViewModel: CategoryListViewModelProtocol {
     
     // MARK: - Types
     
@@ -32,7 +32,6 @@ final class CategoryListViewModel {
     init(trackerCategoryStore: TrackerCategoryStore = TrackerCategoryStore(), selectedCategory: String? = nil) {
         self.trackerCategoryStore = trackerCategoryStore
         self.selectedCategory = selectedCategory
-        print("\(#file):\(#line)] \(#function) ViewModel инициализирована с категорией: \(String(describing: selectedCategory))")
     }
     
     // MARK: - Methods
@@ -40,14 +39,7 @@ final class CategoryListViewModel {
     func loadCategories() {
         do {
             categories = try trackerCategoryStore.fetchCategories()
-            let viewModels = categories.map { category in
-                CategoryViewModel(
-                    title: category.title,
-                    isSelected: category.title == selectedCategory
-                )
-            }
-            onCategoriesUpdated?(viewModels)
-            onEmptyStateChanged?(categories.isEmpty)
+            notifyUpdates()
             print("\(#file):\(#line)] \(#function) Загружено категорий: \(categories.count)")
         } catch {
             onError?(error)
@@ -58,8 +50,11 @@ final class CategoryListViewModel {
     func deleteCategory(title: String) {
         do {
             try trackerCategoryStore.deleteCategory(title: title)
-            print("\(#file):\(#line)] \(#function) Удалена категория: \(title)")
+            if selectedCategory == title {
+                selectedCategory = nil
+            }
             loadCategories()
+            print("\(#file):\(#line)] \(#function) Удалена категория: \(title)")
         } catch {
             onError?(error)
             print("\(#file):\(#line)] \(#function) Ошибка удаления категории: \(error)")
@@ -68,18 +63,32 @@ final class CategoryListViewModel {
     
     func selectCategory(_ title: String) {
         selectedCategory = title
-        loadCategories()
+        notifyUpdates()
         print("\(#file):\(#line)] \(#function) Выбрана категория: \(title)")
     }
     
     func updateCategory(oldTitle: String, newTitle: String) {
         do {
             try trackerCategoryStore.updateCategory(oldTitle: oldTitle, newTitle: newTitle)
+            if selectedCategory == oldTitle {
+                selectedCategory = newTitle
+            }
             loadCategories()
             print("\(#file):\(#line)] \(#function) Категория обновлена: \(oldTitle) -> \(newTitle)")
         } catch {
             onError?(error)
             print("\(#file):\(#line)] \(#function) Ошибка обновления категории: \(error)")
         }
+    }
+    
+    private func notifyUpdates() {
+        let viewModels = categories.map { category in
+            CategoryViewModel(
+                title: category.title,
+                isSelected: category.title == selectedCategory
+            )
+        }
+        onCategoriesUpdated?(viewModels)
+        onEmptyStateChanged?(categories.isEmpty)
     }
 }
