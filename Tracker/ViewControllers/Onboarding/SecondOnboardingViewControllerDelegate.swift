@@ -76,12 +76,10 @@ final class SecondOnboardingViewController: UIViewController {
         ])
     }
     
-    // MARK: - Actions
-    
     @objc private func wowTechnologyButtonTapped() {
-        UserDefaults.standard.set(true, forKey: "OnboardingCompleted")
-        let tabBarController = TabBarController()
-        tabBarController.modalPresentationStyle = .fullScreen
-        present(tabBarController, animated: true)
-    }
-}
+          AppNavigationService.shared.completeOnboarding()
+          let tabBarController = TabBarController()
+          tabBarController.modalPresentationStyle = .fullScreen
+          present(tabBarController, animated: true)
+      }
+  }

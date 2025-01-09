@@ -52,7 +52,7 @@ final class CategoryListController: UIViewController {
         table.separatorStyle = .none
         table.layer.cornerRadius = 16
         table.clipsToBounds = true
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
+        table.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         table.delegate = self
         table.dataSource = self
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -66,12 +66,6 @@ final class CategoryListController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    private var categories: [CategoryViewModel] = [] {
-        didSet {
-            tableView.reloadData()
-        }
-    }
     
     // MARK: - Init
     
@@ -98,8 +92,8 @@ final class CategoryListController: UIViewController {
     // MARK: - Setup
     
     private func setupBindings() {
-        viewModel.onCategoriesUpdated = { [weak self] categories in
-            self?.categories = categories
+        viewModel.onCategoriesUpdated = { [weak self] in
+            self?.tableView.reloadData()
         }
         
         viewModel.onError = { [weak self] error in
@@ -168,12 +162,18 @@ final class CategoryListController: UIViewController {
 
 extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        return viewModel.categoriesCount
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        let category = categories[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as? CategoryCell else {
+              print("\(#file):\(#line)] \(#function) Ошибка приведения типа ячейки")
+              return UITableViewCell()
+          }
+          
+          let category = viewModel.category(at: indexPath.row)
+          cell.isSeparatorHidden = indexPath.row == viewModel.categoriesCount - 1
+          
         
         cell.contentView.subviews.forEach { view in
             if view.tag == 100 {
@@ -189,7 +189,7 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
         cell.backgroundColor = UIColor(named: "backgroundGray")
         cell.selectionStyle = .none
         
-        if indexPath.row < categories.count - 1 {
+        if indexPath.row < viewModel.categoriesCount - 1  {
             let separatorView = UIView()
             separatorView.backgroundColor = .systemGray4
             separatorView.translatesAutoresizingMaskIntoConstraints = false
@@ -218,7 +218,7 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let isFirstCell = indexPath.row == 0
-        let isLastCell = indexPath.row == categories.count - 1
+        let isLastCell = indexPath.row == viewModel.categoriesCount - 1
         
         let maskPath = UIBezierPath(roundedRect: cell.bounds,
                                     byRoundingCorners: [
@@ -232,17 +232,17 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
         shape.path = maskPath.cgPath
         cell.layer.mask = shape
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let category = categories[indexPath.row]
+        let category = viewModel.category(at: indexPath.row)
         viewModel.selectCategory(category.title)
         delegate?.didSelectCategory(category.title)
-        delegate?.didUpdateCategories(categories.map { $0.title })
+        delegate?.didUpdateCategories(viewModel.allCategoryTitles)
         dismissAll()
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        let category = categories[indexPath.row]
+        let category = viewModel.category(at: indexPath.row)
         
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             let editAction = UIAction(
@@ -255,6 +255,7 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
                 let navigationController = UINavigationController(rootViewController: editController)
                 navigationController.modalPresentationStyle = .automatic
                 self.present(navigationController, animated: true)
+                print("\(#file):\(#line)] \(#function) Открыт экран редактирования категории: \(category.title)")
             }
             
             let deleteAction = UIAction(
@@ -272,6 +273,7 @@ extension CategoryListController: UITableViewDelegate, UITableViewDataSource {
                     title: "Удалить",
                     style: .destructive) { [weak self] _ in
                         self?.viewModel.deleteCategory(title: category.title)
+                        print("\(#file):\(#line)] \(#function) Удалена категория: \(category.title)")
                     })
                 
                 alert.addAction(UIAlertAction(

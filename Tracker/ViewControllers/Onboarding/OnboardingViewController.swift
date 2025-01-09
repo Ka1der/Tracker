@@ -11,15 +11,12 @@ final class OnboardingViewController: UIPageViewController {
     
     // MARK: - Properties
     
-    private lazy var pages: [UIViewController] = {
-        let firstPage = FirstOnboardingViewController()
-        let secondPage = SecondOnboardingViewController()
-        return [firstPage, secondPage]
-    }()
+    private var currentPage = 0
+    private let numberOfPages = 2
     
     private lazy var pageControl: UIPageControl = {
         let control = UIPageControl()
-        control.numberOfPages = pages.count
+        control.numberOfPages = numberOfPages
         control.currentPage = 0
         control.currentPageIndicatorTintColor = .black
         control.pageIndicatorTintColor = .gray
@@ -51,7 +48,7 @@ final class OnboardingViewController: UIPageViewController {
         dataSource = self
         delegate = self
         
-        if let firstPage = pages.first {
+        if let firstPage = createOnboardingPage(at: 0) {
             setViewControllers([firstPage], direction: .forward, animated: true)
         }
     }
@@ -64,6 +61,18 @@ final class OnboardingViewController: UIPageViewController {
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
+    
+    private func createOnboardingPage(at index: Int) -> UIViewController? {
+        switch index {
+        case 0:
+            return FirstOnboardingViewController()
+        case 1:
+            return SecondOnboardingViewController()
+        default:
+            print("\(#file):\(#line)] \(#function) Ошибка: некорректный индекс страницы: \(index)")
+            return nil
+        }
+    }
 }
 
 // MARK: - UIPageViewControllerDataSource
@@ -73,7 +82,7 @@ extension OnboardingViewController: UIPageViewControllerDataSource {
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
     ) -> UIViewController? {
-        guard let currentIndex = pages.firstIndex(of: viewController) else {
+        guard let currentIndex = getPageIndex(for: viewController) else {
             print("\(#file):\(#line)] \(#function) Ошибка определения текущей страницы")
             return nil
         }
@@ -81,22 +90,33 @@ extension OnboardingViewController: UIPageViewControllerDataSource {
         let previousIndex = currentIndex - 1
         guard previousIndex >= 0 else { return nil }
         
-        return pages[previousIndex]
+        return createOnboardingPage(at: previousIndex)
     }
     
     func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerAfter viewController: UIViewController
     ) -> UIViewController? {
-        guard let currentIndex = pages.firstIndex(of: viewController) else {
+        guard let currentIndex = getPageIndex(for: viewController) else {
             print("\(#file):\(#line)] \(#function) Ошибка определения текущей страницы")
             return nil
         }
         
         let nextIndex = currentIndex + 1
-        guard nextIndex < pages.count else { return nil }
+        guard nextIndex < numberOfPages else { return nil }
         
-        return pages[nextIndex]
+        return createOnboardingPage(at: nextIndex)
+    }
+    
+    private func getPageIndex(for viewController: UIViewController) -> Int? {
+        switch viewController {
+        case is FirstOnboardingViewController:
+            return 0
+        case is SecondOnboardingViewController:
+            return 1
+        default:
+            return nil
+        }
     }
 }
 
@@ -110,9 +130,10 @@ extension OnboardingViewController: UIPageViewControllerDelegate {
         transitionCompleted completed: Bool
     ) {
         if completed,
-           let visibleViewController = pageViewController.viewControllers?.first,
-           let currentIndex = pages.firstIndex(of: visibleViewController) {
+           let currentViewController = pageViewController.viewControllers?.first,
+           let currentIndex = getPageIndex(for: currentViewController) {
             pageControl.currentPage = currentIndex
+            currentPage = currentIndex
         }
     }
 }

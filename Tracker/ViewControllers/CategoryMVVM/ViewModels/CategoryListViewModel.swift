@@ -7,19 +7,30 @@
 
 import Foundation
 
-final class CategoryListViewModel: CategoryListViewModelProtocol {
+final class CategoryListViewModel {
     
     // MARK: - Types
     
-    typealias UpdateHandler = ([CategoryViewModel]) -> Void
+    typealias UpdateHandler = () -> Void
     typealias ErrorHandler = (Error) -> Void
     typealias EmptyStateHandler = (Bool) -> Void
     
     // MARK: - Properties
     
     private let trackerCategoryStore: TrackerCategoryStore
-    private var categories: [TrackerCategory] = []
+    private var categories: [CategoryViewModel] = []
     private var selectedCategory: String?
+    var allCategoryTitles: [String] {
+        return categories.map { $0.title }
+    }
+    
+    var categoriesCount: Int {
+        return categories.count
+    }
+    
+    var categoryTitles: [String] {
+        return categories.map { $0.title }
+    }
     
     // MARK: - Bindings
     
@@ -32,14 +43,26 @@ final class CategoryListViewModel: CategoryListViewModelProtocol {
     init(trackerCategoryStore: TrackerCategoryStore = TrackerCategoryStore(), selectedCategory: String? = nil) {
         self.trackerCategoryStore = trackerCategoryStore
         self.selectedCategory = selectedCategory
+        print("\(#file):\(#line)] \(#function) ViewModel инициализирована с категорией: \(String(describing: selectedCategory))")
     }
     
     // MARK: - Methods
     
+    func category(at index: Int) -> CategoryViewModel {
+        return categories[index]
+    }
+    
     func loadCategories() {
         do {
-            categories = try trackerCategoryStore.fetchCategories()
-            notifyUpdates()
+            let loadedCategories = try trackerCategoryStore.fetchCategories()
+            categories = loadedCategories.map { category in
+                CategoryViewModel(
+                    title: category.title,
+                    isSelected: category.title == selectedCategory
+                )
+            }
+            onCategoriesUpdated?()
+            onEmptyStateChanged?(categories.isEmpty)
             print("\(#file):\(#line)] \(#function) Загружено категорий: \(categories.count)")
         } catch {
             onError?(error)
@@ -50,11 +73,8 @@ final class CategoryListViewModel: CategoryListViewModelProtocol {
     func deleteCategory(title: String) {
         do {
             try trackerCategoryStore.deleteCategory(title: title)
-            if selectedCategory == title {
-                selectedCategory = nil
-            }
-            loadCategories()
             print("\(#file):\(#line)] \(#function) Удалена категория: \(title)")
+            loadCategories()
         } catch {
             onError?(error)
             print("\(#file):\(#line)] \(#function) Ошибка удаления категории: \(error)")
@@ -63,32 +83,18 @@ final class CategoryListViewModel: CategoryListViewModelProtocol {
     
     func selectCategory(_ title: String) {
         selectedCategory = title
-        notifyUpdates()
+        loadCategories()
         print("\(#file):\(#line)] \(#function) Выбрана категория: \(title)")
     }
     
     func updateCategory(oldTitle: String, newTitle: String) {
         do {
             try trackerCategoryStore.updateCategory(oldTitle: oldTitle, newTitle: newTitle)
-            if selectedCategory == oldTitle {
-                selectedCategory = newTitle
-            }
             loadCategories()
             print("\(#file):\(#line)] \(#function) Категория обновлена: \(oldTitle) -> \(newTitle)")
         } catch {
             onError?(error)
             print("\(#file):\(#line)] \(#function) Ошибка обновления категории: \(error)")
         }
-    }
-    
-    private func notifyUpdates() {
-        let viewModels = categories.map { category in
-            CategoryViewModel(
-                title: category.title,
-                isSelected: category.title == selectedCategory
-            )
-        }
-        onCategoriesUpdated?(viewModels)
-        onEmptyStateChanged?(categories.isEmpty)
     }
 }
