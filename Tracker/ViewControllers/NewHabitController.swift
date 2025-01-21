@@ -354,7 +354,7 @@ final class NewHabitController: UIViewController {
             return
         }
         
-        let trackersCoreStore = TrackerCoreStore()
+        let categoryTitle = selectedCategory ?? "Важное"
         
         let newTracker = Tracker(
             id: UUID(),
@@ -363,24 +363,23 @@ final class NewHabitController: UIViewController {
             emoji: emoji,
             schedule: schedule,
             isPinned: false,
-            creationDate: nil
+            creationDate: nil,
+            originalCategory: categoryTitle
         )
         
-        let categoryTitle = selectedCategory ?? "Важное"
-           let trackerCategory = TrackerCategory(
-               title: categoryTitle,
-               trackers: [newTracker]
-           )
-        
+        let trackerCategory = TrackerCategory(
+            title: categoryTitle,
+            trackers: [newTracker]
+        )
         do {
             try trackerStore.createTracker(newTracker, category: trackerCategory)
-                  print("\(#file):\(#line)] \(#function) Трекер сохранен")
-                  delegate?.didCreateTracker(newTracker, category: categoryTitle)
-                  dismiss(animated: true)
-              } catch {
-                  print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
-              }
-          }
+            print("\(#file):\(#line)] \(#function) Трекер сохранен")
+            delegate?.didCreateTracker(newTracker, category: categoryTitle)
+            dismiss(animated: true)
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
+        }
+    }
     
     @objc private func scheduleButtonTapped() {
         let scheduleController = NewScheduleController()

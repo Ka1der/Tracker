@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AppMetricaCore
 
 final class TrackersViewController: UIViewController {
     
@@ -18,11 +19,17 @@ final class TrackersViewController: UIViewController {
     var completedTrackers: Set<CompletedTrackerID> = []
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     private let trackerRecordStore = TrackerRecordStore()
+    private let trackerCategoryStore = TrackerCategoryStore()
+    let params: [AnyHashable: Any] = [
+        "key1": "value1",
+        "key2": "value2"
+    ]
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
-        formatter.locale = Locale(identifier: "ru")
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        formatter.locale = Locale.current
         return formatter
     }()
     
@@ -264,6 +271,9 @@ final class TrackersViewController: UIViewController {
         let navigationController = UINavigationController(rootViewController: newTrackerController)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
+        AppMetrica.reportEvent(name: "Tracker added", parameters: params, onFailure: { error in
+            print("REPORT ERROR: %@", error.localizedDescription)
+        })
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -272,8 +282,8 @@ final class TrackersViewController: UIViewController {
         print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
         
         filteredCategories = filterTrackersByDate(currentDate)
-        collectionView.reloadData()
-        updatePlaceholderVisibility()
+        self.collectionView.reloadData()
+        self.updatePlaceholderVisibility()
     }
     
     // MARK: - Private Methods
@@ -305,22 +315,39 @@ final class TrackersViewController: UIViewController {
     }
     
     private func loadTrackersFromStore() {
-        
         do {
             let loadedTrackers = try trackerStore.fetchTrackers()
             
             var categoriesDict: [String: [Tracker]] = [:]
             
-            for tracker in loadedTrackers {
-                let categoryTitle = "Важное" // TODO: Позже добавить логику категорий
-                categoriesDict[categoryTitle, default: []].append(tracker)
+            let pinnedTrackers = loadedTrackers.filter { $0.isPinned }
+            if !pinnedTrackers.isEmpty {
+                categoriesDict["Закрепленные"] = pinnedTrackers
             }
+            let unpinnedTrackers = loadedTrackers.filter { !$0.isPinned }
+            
+            for tracker in unpinnedTrackers {
+                      let categoryTitle = tracker.originalCategory ?? "Важное"
+                      categoriesDict[categoryTitle, default: []].append(tracker)
+                  }
+            
             categories = categoriesDict.map { TrackerCategory(title: $0.key, trackers: $0.value) }
+            categories.sort { category1, category2 in
+                if category1.title == "Закрепленные" {
+                    return true
+                }
+                if category2.title == "Закрепленные" {
+                    return false
+                }
+                return category1.title < category2.title
+            }
+            
             filteredCategories = filterTrackersByDate(currentDate)
             
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
                 self.updatePlaceholderVisibility()
+                print("\(#file):\(#line)] \(#function) Загружено категорий: \(self.categories.count), из них закрепленных трекеров: \(pinnedTrackers.count)")
             }
         } catch {
             print("\(#file):\(#line)] \(#function) Ошибка загрузки трекеров: \(error)")
@@ -400,9 +427,51 @@ extension TrackersViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] suggestedActions in
-            let pinAction = UIAction(title: "Закрепить", image: UIImage(systemName: "pin")) { [weak self] _ in
-                print("\(#file):\(#line)] \(#function) Закрепить трекер")
+        
+        let tracker = filteredCategories[indexPath.section].trackers[indexPath.item]
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            guard let self = self else { return UIMenu(title: "", children: []) }
+            
+            let pinTitle = tracker.isPinned ? "Открепить" : "Закрепить"
+            let pinImage = UIImage(systemName: tracker.isPinned ? "pin.slash" : "pin")
+            
+            let pinAction = UIAction(title: pinTitle, image: pinImage) { [weak self] _ in
+                guard let self = self else { return }
+                
+                let tracker = self.filteredCategories[indexPath.section].trackers[indexPath.item]
+                let categoryTitle = self.filteredCategories[indexPath.section].title
+                
+                let updatedTracker = Tracker(
+                    id: tracker.id,
+                    title: tracker.title,
+                    color: tracker.color,
+                    emoji: tracker.emoji,
+                    schedule: tracker.schedule,
+                    isPinned: !tracker.isPinned,
+                    creationDate: tracker.creationDate,
+                    originalCategory: tracker.isPinned ? tracker.originalCategory : categoryTitle
+                )
+                
+                do {
+                    try self.trackerStore.updateTracker(updatedTracker)
+                    self.loadTrackersFromStore()
+                    
+                    if let categoryIndex = self.categories.firstIndex(where: { $0.title == categoryTitle }) {
+                        var updatedTrackers = self.categories[categoryIndex].trackers
+                        if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == tracker.id }) {
+                            updatedTrackers[trackerIndex] = updatedTracker
+                            self.categories[categoryIndex] = TrackerCategory(title: categoryTitle, trackers: updatedTrackers)
+                        }
+                    }
+                    
+                    self.collectionView.reloadData()
+                    self.updatePlaceholderVisibility()
+                    
+                    print("\(#file):\(#line)] \(#function) Трекер \(tracker.isPinned ? "откреплен" : "закреплен"): \(tracker.title)")
+                } catch {
+                    print("\(#file):\(#line)] \(#function) Ошибка при обновлении трекера: \(error)")
+                }
             }
             
             let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { [weak self] _ in
@@ -416,9 +485,9 @@ extension TrackersViewController: UICollectionViewDelegate {
             ) { [weak self] _ in
                 guard let self = self else { return }
                 let alert = UIAlertController(
-                    title: "Удалить трекер?",
-                    message: "Эта операция не может быть отменена",
-                    preferredStyle: .alert
+                    title: "Уверены что хотите удалить трекер?",
+                    message: nil,
+                    preferredStyle: .actionSheet
                 )
                 alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
                 alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
@@ -426,6 +495,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                 })
                 self.present(alert, animated: true)
             }
+            
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
         }
     }
@@ -434,6 +504,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         print("\(#file):\(#line)] \(#function) Снято выделение с ячейки: \(indexPath.item)")
     }
 }
+
 
 // MARK: - NewHabitControllerDelegate
 
@@ -452,6 +523,9 @@ extension TrackersViewController: NewHabitControllerDelegate {
         }
         categories = newCategories
         filteredCategories = filterTrackersByDate(currentDate)
+        
+        self.collectionView.reloadData()
+        self.updatePlaceholderVisibility()
         
         DispatchQueue.main.async {
             self.collectionView.reloadData()
@@ -515,6 +589,8 @@ extension TrackersViewController {
                     }
                     
                     filteredCategories = filterTrackersByDate(currentDate)
+                    self.collectionView.reloadData()
+                    self.updatePlaceholderVisibility()
                     print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
                     collectionView.reloadData()
                     updatePlaceholderVisibility()

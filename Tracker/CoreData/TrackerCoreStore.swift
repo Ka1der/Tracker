@@ -17,8 +17,8 @@ final class TrackerCoreStore: TrackerStoreProtocol {
     // MARK: - Init
     
     init(context: NSManagedObjectContext = PersistentContainer.shared.viewContext) {
-           self.context = context
-       }
+        self.context = context
+    }
     
     // MARK: - Methods
     
@@ -33,6 +33,11 @@ final class TrackerCoreStore: TrackerStoreProtocol {
         })
         trackerCoreData.isPinned = tracker.isPinned
         trackerCoreData.creationDate = tracker.creationDate
+        trackerCoreData.originalCategory = tracker.originalCategory
+        
+        let categoryRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+           categoryRequest.predicate = NSPredicate(format: "title == %@", category.title)
+           
         
         do {
             try context.save()
@@ -44,9 +49,9 @@ final class TrackerCoreStore: TrackerStoreProtocol {
     }
     
     func fetchTrackers() throws -> [Tracker] {
-          let request = TrackerCoreData.fetchRequest()
-          return try context.fetch(request).map { try tracker(from: $0) }
-      }
+        let request = TrackerCoreData.fetchRequest()
+        return try context.fetch(request).map { try tracker(from: $0) }
+    }
     
     // MARK: - Private methods
     
@@ -66,7 +71,8 @@ final class TrackerCoreStore: TrackerStoreProtocol {
             emoji: emoji,
             schedule: WeekDay.decode(from: trackerCoreData.schedule),
             isPinned: trackerCoreData.isPinned,
-            creationDate: trackerCoreData.creationDate
+            creationDate: trackerCoreData.creationDate,
+            originalCategory: trackerCoreData.originalCategory ?? "Важное"
         )
     }
     
@@ -84,24 +90,43 @@ final class TrackerCoreStore: TrackerStoreProtocol {
     }
     
     func deleteTracker(id: UUID) throws {
-           let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-           fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-              
-           do {
-               let trackers = try context.fetch(fetchRequest)
-               if let trackerToDelete = trackers.first {
-                   context.delete(trackerToDelete)
-                   try context.save()
-                   print("\(#file):\(#line)] \(#function) Трекер успешно удалён из CoreData: \(id)")
-               } else {
-                   print("\(#file):\(#line)] \(#function) Трекер не найден в CoreData: \(id)")
-               }
-           } catch {
-               print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
-               throw error
-           }
-       }
-   }
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            let trackers = try context.fetch(fetchRequest)
+            if let trackerToDelete = trackers.first {
+                context.delete(trackerToDelete)
+                try context.save()
+                print("\(#file):\(#line)] \(#function) Трекер успешно удалён из CoreData: \(id)")
+            } else {
+                print("\(#file):\(#line)] \(#function) Трекер не найден в CoreData: \(id)")
+            }
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка при удалении трекера: \(error)")
+            throw error
+        }
+    }
+    
+    func updateTracker(_ tracker: Tracker) throws {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        
+        do {
+            let trackers = try context.fetch(fetchRequest)
+            if let trackerToUpdate = trackers.first {
+                trackerToUpdate.isPinned = tracker.isPinned
+                try context.save()
+                print("\(#file):\(#line)] \(#function) Трекер успешно обновлен: \(tracker.title)")
+            } else {
+                print("\(#file):\(#line)] \(#function) Трекер не найден: \(tracker.id)")
+            }
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка при обновлении трекера: \(error)")
+            throw error
+        }
+    }
+}
 
 // MARK: - Errors
 

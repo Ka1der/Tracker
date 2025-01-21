@@ -71,6 +71,16 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
+    private lazy var pinIcon: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "pin.fill")
+        //        imageView.image = UIImage(named: "pinIcon")
+        imageView.tintColor = .white
+        imageView.isHidden = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
     // MARK: - Lifecycle
     
     override init(frame: CGRect) {
@@ -91,6 +101,7 @@ final class TrackerCell: UICollectionViewCell {
         cardView.addSubview(titleLabel)
         contentView.addSubview(completeButton)
         contentView.addSubview(counterLabel)
+        cardView.addSubview(pinIcon)
         
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -117,6 +128,11 @@ final class TrackerCell: UICollectionViewCell {
             
             counterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             counterLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
+            
+            pinIcon.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
+            pinIcon.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
+            pinIcon.widthAnchor.constraint(equalToConstant: 16),
+            pinIcon.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
     
@@ -191,6 +207,8 @@ final class TrackerCell: UICollectionViewCell {
         completeButton.tintColor = .white
         counterLabel.text = "\(completedDaysCount) дней"
         setCompletedState(isCompleted)
+        
+        pinIcon.isHidden = !tracker.isPinned
     }
 }
 
