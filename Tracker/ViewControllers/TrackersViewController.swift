@@ -140,6 +140,17 @@ final class TrackersViewController: UIViewController {
         return collectionView
     }()
     
+    private lazy var filterButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Фильтры", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 16
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -171,6 +182,7 @@ final class TrackersViewController: UIViewController {
         placeholderStack.addArrangedSubview(placeholderLabel)
         view.addSubview(placeholderStack)
         view.addSubview(collectionView)
+        view.addSubview(filterButton)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
@@ -183,7 +195,12 @@ final class TrackersViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+              filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+              filterButton.heightAnchor.constraint(equalToConstant: 50),
+              filterButton.widthAnchor.constraint(equalToConstant: 114),
         ])
     }
     
@@ -286,6 +303,10 @@ final class TrackersViewController: UIViewController {
         self.updatePlaceholderVisibility()
     }
     
+    @objc private func filterButtonTapped() {
+        print("\(#file):\(#line)] \(#function) Нажата кнопка фильтров")
+    }
+    
     // MARK: - Private Methods
     
     private func updatePlaceholderVisibility() {
@@ -327,9 +348,9 @@ final class TrackersViewController: UIViewController {
             let unpinnedTrackers = loadedTrackers.filter { !$0.isPinned }
             
             for tracker in unpinnedTrackers {
-                      let categoryTitle = tracker.originalCategory ?? "Важное"
-                      categoriesDict[categoryTitle, default: []].append(tracker)
-                  }
+                let categoryTitle = tracker.originalCategory ?? "Важное"
+                categoriesDict[categoryTitle, default: []].append(tracker)
+            }
             
             categories = categoriesDict.map { TrackerCategory(title: $0.key, trackers: $0.value) }
             categories.sort { category1, category2 in
