@@ -133,9 +133,22 @@ final class NewCategoryController: UIViewController {
     // MARK: - Actions
     
     @objc private func doneButtonTapped() {
-        guard let title = nameTextField.text else { return }
-        viewModel.createCategory(title: title)
-    }
+        
+        if nameTextField.text?.lowercased() == "закрепленные" {
+               let alert = UIAlertController(
+                   title: "Ошибка",
+                   message: "Такое название категории использовать нельзя",
+                   preferredStyle: .alert
+               )
+               alert.addAction(UIAlertAction(title: "OK", style: .default))
+               present(alert, animated: true)
+               print("\(#file):\(#line)] \(#function) Попытка создания запрещенной категории: \(nameTextField.text ?? "")")
+               return
+           }
+           
+           guard let title = nameTextField.text else { return }
+           viewModel.createCategory(title: title)
+       }
     
     @objc private func hideKeyboard() {
         view.endEditing(true)
