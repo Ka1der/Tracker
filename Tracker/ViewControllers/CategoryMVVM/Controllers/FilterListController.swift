@@ -10,11 +10,13 @@ import UIKit
 final class FilterListController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel: FilterListViewModelProtocol
+    
+    var viewModel: FilterListViewModelProtocol
     private let filterView = FilterListView()
-
+    weak var delegate: FilterListControllerDelegate?
     
     // MARK: - Init
+    
     init(viewModel: FilterListViewModelProtocol = FilterListViewModel()) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -26,12 +28,14 @@ final class FilterListController: UIViewController {
     }
     
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
     
     // MARK: - Setup
+    
     private func setupViews() {
         filterView.translatesAutoresizingMaskIntoConstraints = false
         filterView.tableView.delegate = self
@@ -73,7 +77,7 @@ extension FilterListController: UITableViewDelegate, UITableViewDataSource {
         
         let checkmark = UIImageView(image: UIImage(systemName: "checkmark"))
         checkmark.tintColor = .systemBlue
-        checkmark.isHidden = filter != viewModel.selectedFilter
+        checkmark.isHidden = filter != viewModel.selectedFilter 
         cell.accessoryView = checkmark
         
         return cell
@@ -103,6 +107,7 @@ extension FilterListController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedFilter = viewModel.filters[indexPath.row]
         viewModel.selectFilter(selectedFilter)
+        delegate?.didSelectFilter(selectedFilter)
         tableView.reloadData()
         dismiss(animated: true)
     }
