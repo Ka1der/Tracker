@@ -20,6 +20,7 @@ final class TrackersViewController: UIViewController {
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     private let trackerRecordStore = TrackerRecordStore()
     private let trackerCategoryStore = TrackerCategoryStore()
+    let bottomInset: CGFloat = 80
     let params: [AnyHashable: Any] = [
         "key1": "value1",
         "key2": "value2"
