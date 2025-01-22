@@ -305,6 +305,10 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func filterButtonTapped() {
+        let filterListViewModel = FilterListViewModel()
+        let filterListController = FilterListController(viewModel: filterListViewModel)
+        filterListController.modalPresentationStyle = .automatic
+        present(filterListController, animated: true)
         print("\(#file):\(#line)] \(#function) Нажата кнопка фильтров")
     }
     
