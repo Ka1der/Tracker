@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AppMetricaCore
+import YandexMobileMetrica
 
 final class TrackersViewController: UIViewController {
     
@@ -320,9 +320,7 @@ final class TrackersViewController: UIViewController {
         let navigationController = UINavigationController(rootViewController: newTrackerController)
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
-        AppMetrica.reportEvent(name: "Tracker added", parameters: params, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
+      
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
