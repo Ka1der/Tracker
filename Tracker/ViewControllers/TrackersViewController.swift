@@ -118,6 +118,23 @@ final class TrackersViewController: UIViewController {
         return picker
     }()
     
+    private lazy var emptyFilterLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ничего не найдено"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 12)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isHidden = true
+        return label
+    }()
+    
+    private lazy var emptyFilterImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "NothingNotFound")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -186,6 +203,8 @@ final class TrackersViewController: UIViewController {
         view.addSubview(placeholderStack)
         view.addSubview(collectionView)
         view.addSubview(filterButton)
+        view.addSubview(emptyFilterLabel)
+        view.addSubview(emptyFilterImage)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
@@ -204,6 +223,11 @@ final class TrackersViewController: UIViewController {
             filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             filterButton.heightAnchor.constraint(equalToConstant: 50),
             filterButton.widthAnchor.constraint(equalToConstant: 114),
+            
+            emptyFilterImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyFilterImage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            emptyFilterLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyFilterLabel.topAnchor.constraint(equalTo: emptyFilterImage.bottomAnchor, constant: 8)
         ])
     }
     
@@ -305,7 +329,7 @@ final class TrackersViewController: UIViewController {
         currentDate = sender.date
         let formattedDate = dateFormatter.string(from: sender.date)
         print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
-    
+        
         filteredTracker(currentFilter)
         updateFilterButtonVisibility()
     }
@@ -323,10 +347,12 @@ final class TrackersViewController: UIViewController {
     
     private func updatePlaceholderVisibility() {
         let hasVisibleTrackers = !filteredCategories.isEmpty
+        let isFiltering = currentFilter != .allTrackers
         
-        placeholderStack.isHidden = hasVisibleTrackers
+        placeholderStack.isHidden = hasVisibleTrackers || isFiltering
+        emptyFilterLabel.isHidden = hasVisibleTrackers || !isFiltering
+        emptyFilterImage.isHidden = hasVisibleTrackers || !isFiltering
         collectionView.isHidden = !hasVisibleTrackers
-        print("\(#file):\(#line)] \(#function) Всего трекеров: \(categories.count), Видимых трекеров: \(filteredCategories.count)")
     }
     
     private func isFutureDate(_ date: Date) -> Bool {
