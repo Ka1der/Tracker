@@ -10,6 +10,7 @@ import AppMetricaCore
 
 final class TrackersViewController: UIViewController {
     
+    
     // MARK: - Properties
     
     let layoutParams = LayoutParams()
@@ -199,9 +200,9 @@ final class TrackersViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-              filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-              filterButton.heightAnchor.constraint(equalToConstant: 50),
-              filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
         ])
     }
     
@@ -307,6 +308,7 @@ final class TrackersViewController: UIViewController {
     @objc private func filterButtonTapped() {
         let filterListViewModel = FilterListViewModel()
         let filterListController = FilterListController(viewModel: filterListViewModel)
+        filterListController.delegate = self
         filterListController.modalPresentationStyle = .automatic
         present(filterListController, animated: true)
         print("\(#file):\(#line)] \(#function) Нажата кнопка фильтров")
@@ -442,9 +444,42 @@ final class TrackersViewController: UIViewController {
             Calendar.current.isDate(lhs.date, inSameDayAs: rhs.date)
         }
     }
+    
+    func filteredTracker(_ filter: FilterType) {
+        switch filter {
+        case .allTrackers:
+            filteredCategories = filterTrackersByDate(currentDate)
+        case .todayTrackers:
+            filteredCategories = filterTrackersByDate(Date())
+        case .completedTrackers:
+            filteredCategories = categories.compactMap { category in
+                let filteredTrackers = category.trackers.filter { tracker in
+                    completedTrackers.contains { $0.id == tracker.id }
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+            }
+        case .uncompletedTrackers:
+            filteredCategories = categories.compactMap { category in
+                let filteredTrackers = category.trackers.filter { tracker in
+                    !completedTrackers.contains { $0.id == tracker.id }
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+            }
+        }
+        
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
+        print("\(#file):\(#line)] \(#function) Применен фильтр: \(filter.rawValue)")
+    }
 }
 
 // MARK: - UICollectionViewDelegate
+
+extension TrackersViewController: FilterListControllerDelegate {
+    func didSelectFilter(_ filter: FilterType) {
+        filteredTracker(filter)
+    }
+}
 
 extension TrackersViewController: UICollectionViewDelegate {
     
