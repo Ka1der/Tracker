@@ -238,6 +238,11 @@ final class TrackersViewController: UIViewController {
         ])
     }
     
+    private func updateFilterButtonVisibility() {
+        let hasTrackersForDate = !filterTrackersByDate(currentDate).isEmpty
+        filterButton.isHidden = !hasTrackersForDate
+    }
+    
     private func filterTrackersByDate(_ date: Date) -> [TrackerCategory] {
         let calendar = Calendar.current
         let weekday = calendar.component(.weekday, from: date)
@@ -302,6 +307,7 @@ final class TrackersViewController: UIViewController {
         print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
     
         filteredTracker(currentFilter)
+        updateFilterButtonVisibility()
     }
     
     @objc private func filterButtonTapped() {
@@ -374,6 +380,7 @@ final class TrackersViewController: UIViewController {
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
                 self.updatePlaceholderVisibility()
+                self.updateFilterButtonVisibility()
                 print("\(#file):\(#line)] \(#function) Загружено категорий: \(self.categories.count), из них закрепленных трекеров: \(pinnedTrackers.count)")
             }
         } catch {
