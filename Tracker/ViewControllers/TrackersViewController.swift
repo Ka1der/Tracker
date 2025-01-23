@@ -21,6 +21,7 @@ final class TrackersViewController: UIViewController {
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     private let trackerRecordStore = TrackerRecordStore()
     private let trackerCategoryStore = TrackerCategoryStore()
+    private var currentFilter: FilterType = .allTrackers
     let bottomInset: CGFloat = 80
     let params: [AnyHashable: Any] = [
         "key1": "value1",
@@ -299,10 +300,8 @@ final class TrackersViewController: UIViewController {
         currentDate = sender.date
         let formattedDate = dateFormatter.string(from: sender.date)
         print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
-        
-        filteredCategories = filterTrackersByDate(currentDate)
-        self.collectionView.reloadData()
-        self.updatePlaceholderVisibility()
+    
+        filteredTracker(currentFilter)
     }
     
     @objc private func filterButtonTapped() {
@@ -446,22 +445,30 @@ final class TrackersViewController: UIViewController {
     }
     
     func filteredTracker(_ filter: FilterType) {
+        currentFilter = filter
         switch filter {
         case .allTrackers:
             filteredCategories = filterTrackersByDate(currentDate)
+            
         case .todayTrackers:
-            filteredCategories = filterTrackersByDate(Date())
+            datePicker.setDate(Date(), animated: true)
+            currentDate = Date()
+            filteredCategories = filterTrackersByDate(currentDate)
+            
         case .completedTrackers:
-            filteredCategories = categories.compactMap { category in
+            let dateFiltered = filterTrackersByDate(currentDate)
+            filteredCategories = dateFiltered.compactMap { category in
                 let filteredTrackers = category.trackers.filter { tracker in
-                    completedTrackers.contains { $0.id == tracker.id }
+                    isTrackerCompleted(tracker, date: currentDate)
                 }
                 return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
             }
+            
         case .uncompletedTrackers:
-            filteredCategories = categories.compactMap { category in
+            let dateFiltered = filterTrackersByDate(currentDate)
+            filteredCategories = dateFiltered.compactMap { category in
                 let filteredTrackers = category.trackers.filter { tracker in
-                    !completedTrackers.contains { $0.id == tracker.id }
+                    !isTrackerCompleted(tracker, date: currentDate)
                 }
                 return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
             }
