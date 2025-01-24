@@ -191,6 +191,25 @@ final class TrackersViewController: UIViewController {
         )
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let eventName = "open"
+        let eventParameters: [AnyHashable: Any] = [
+            "Screen" : "Main",
+        ]
+        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        let eventName = "close"
+        let eventParameters: [AnyHashable: Any] = [
+            "Screen" : "Main",
+        ]
+        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
+    }
     // MARK: - Setup Methods
     
     private func setupViews() {
@@ -321,6 +340,12 @@ final class TrackersViewController: UIViewController {
         navigationController.modalPresentationStyle = .automatic
         present(navigationController, animated: true)
       
+        let eventName = "click"
+        let eventParameters: [AnyHashable: Any] = [
+            "Screen" : "Main",
+            "Item" : "add_track"
+        ]
+        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -338,7 +363,13 @@ final class TrackersViewController: UIViewController {
         filterListController.delegate = self
         filterListController.modalPresentationStyle = .automatic
         present(filterListController, animated: true)
-        print("\(#file):\(#line)] \(#function) Нажата кнопка фильтров")
+       
+        let eventName = "click"
+        let eventParameters: [AnyHashable: Any] = [
+            "Screen" : "Main",
+            "Item" : "filter"
+        ]
+        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
     }
     
     // MARK: - Private Methods
@@ -575,6 +606,13 @@ extension TrackersViewController: UICollectionViewDelegate {
             
             let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { [weak self] _ in
                 print("\(#file):\(#line)] \(#function) Редактировать трекер")
+                
+                let eventName = "click"
+                let eventParameters: [AnyHashable: Any] = [
+                    "Screen" : "Main",
+                    "Item" : "edit"
+                ]
+                YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
             }
             
             let deleteAction = UIAction(
@@ -593,6 +631,13 @@ extension TrackersViewController: UICollectionViewDelegate {
                     self?.deleteTracker(at: indexPath)
                 })
                 self.present(alert, animated: true)
+                
+                let eventName = "click"
+                let eventParameters: [AnyHashable: Any] = [
+                    "Screen" : "Main",
+                    "Item" : "delete"
+                ]
+                YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
             }
             
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])

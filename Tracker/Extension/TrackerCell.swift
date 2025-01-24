@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import YandexMobileMetrica
 
 final class TrackerCell: UICollectionViewCell {
     
@@ -74,7 +75,6 @@ final class TrackerCell: UICollectionViewCell {
     private lazy var pinIcon: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "pin.fill")
-        //        imageView.image = UIImage(named: "pinIcon")
         imageView.tintColor = .white
         imageView.isHidden = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -153,7 +153,12 @@ final class TrackerCell: UICollectionViewCell {
         counterLabel.text = "\(completedDaysCount) дней"
         completionHandler?()
         
-        print("\(#file):\(#line)] \(#function) Изменено состояние трекера: \(tracker.title), выполнено: \(isCompleted)")
+        let eventName = "click"
+        let eventParameters: [AnyHashable: Any] = [
+            "Screen" : "Main",
+            "Item" : "track"
+        ]
+        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
     }
     
     // MARK: - Private Methods
