@@ -30,15 +30,17 @@ final class TabBarController: UITabBarController {
         )
         trackers.tabBarItem.setTitleTextAttributes(trackerText as [NSAttributedString.Key : Any], for: .normal)
         
-        let statistic = UIViewController()
-        statistic.tabBarItem = UITabBarItem(
+        let statisticVC = StatisticViewController()
+        let statisticNavigationController = UINavigationController(rootViewController: statisticVC)
+        
+        statisticNavigationController.tabBarItem = UITabBarItem(
             title: "Статистика",
             image: UIImage(named: "Statistic"),
             selectedImage: nil
         )
-        statistic.tabBarItem.setTitleTextAttributes(trackerText as [NSAttributedString.Key : Any], for: .normal)
+        statisticNavigationController.tabBarItem.setTitleTextAttributes(trackerText as [NSAttributedString.Key : Any], for: .normal)
         
-        viewControllers = [trackers, statistic]
+        viewControllers = [trackers, statisticNavigationController]
         
         tabBar.tintColor = UIColor(named: "tabBarTintColor")
         tabBar.backgroundColor = .white

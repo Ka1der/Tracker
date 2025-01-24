@@ -12,10 +12,14 @@ import YandexMobileMetrica
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let configuration = YMMYandexMetricaConfiguration(apiKey: "<Ваш_API_KEY>")
-        YMMYandexMetrica.activate(with: configuration!)
-
-        print("Yandex Mobile Metrica инициализирована")
+        
+        guard let configuration = YMMYandexMetricaConfiguration(apiKey: "<Ваш_API_KEY>") else {
+            print("\(#file):\(#line)] \(#function) Ошибка: не удалось создать конфигурацию YandexMetrica")
+            return true
+        }
+        
+        YMMYandexMetrica.activate(with: configuration)
+        print("\(#file):\(#line)] \(#function) YandexMetrica успешно инициализирована")
         return true
     }
 
