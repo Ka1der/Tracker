@@ -150,7 +150,7 @@ final class TrackerCell: UICollectionViewCell {
         isCompleted.toggle()
         setCompletedState(isCompleted)
         completedDaysCount += isCompleted ? 1 : -1
-        counterLabel.text = "\(completedDaysCount) дней"
+        counterLabel.text = pluralizeDays(completedDaysCount)
         completionHandler?()
         
         AnalyticsService.shared.trackEvent("click", parameters: [
@@ -208,10 +208,21 @@ final class TrackerCell: UICollectionViewCell {
         completeButton.backgroundColor = tracker.color
         completeButton.layer.borderColor = tracker.color.cgColor
         completeButton.tintColor = .white
-        counterLabel.text = "\(completedDaysCount) дней"
+        counterLabel.text = pluralizeDays(completedDaysCount)
         setCompletedState(isCompleted)
         
         pinIcon.isHidden = !tracker.isPinned
+    }
+    
+    private func pluralizeDays(_ count: Int) -> String {
+        let mod10 = count % 10
+        let mod100 = count % 100
+        
+        if mod10 == 1 && mod100 != 11 {
+            return "\(count) \(Localization.dayText)"
+        } else {
+            return "\(count) \(Localization.daysText)"
+        }
     }
 }
 

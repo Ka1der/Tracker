@@ -59,7 +59,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Трекеры"
+        label.text = Localization.trackersText
         label.font = .systemFont(ofSize: 34, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -67,7 +67,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.placeholder = "Поиск"
+        searchBar.placeholder = Localization.searchText
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundImage = UIImage()
         searchBar.backgroundColor = .clear
@@ -94,7 +94,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = Localization.emptyStateText
         label.textColor = .label
         label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -299,15 +299,12 @@ final class TrackersViewController: UIViewController {
                         let isCompletedOnThisDay = completedTrackers.contains { completedID in
                             completedID.id == tracker.id && calendar.isDate(completedID.date, inSameDayAs: date)
                         }
-                        print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)' выполнено, отображается: \(isCompletedOnThisDay)")
                         return isCompletedOnThisDay
                     } else {
-                        print("\(#file):\(#line)] \(#function) Нерегулярное событие '\(tracker.title)' не выполнено, отображается")
                         return true
                     }
                 } else {
                     let isScheduledForToday = tracker.schedule.contains(adjustedWeekday)
-                    print("\(#file):\(#line)] \(#function) Регулярная привычка '\(tracker.title)': запланирована на \(adjustedWeekday.shortName), показывать: \(isScheduledForToday)")
                     return isScheduledForToday
                 }
             }
@@ -345,7 +342,6 @@ final class TrackersViewController: UIViewController {
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
         let formattedDate = dateFormatter.string(from: sender.date)
-        print("\(#file):\(#line)] \(#function) Выбрана дата: \(formattedDate)")
         
         filteredTracker(currentFilter)
         updateFilterButtonVisibility()
@@ -480,7 +476,6 @@ final class TrackersViewController: UIViewController {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
             self.updatePlaceholderVisibility()
-            print("\(#file):\(#line)] \(#function) Добавлена новая категория: \(title)")
         }
     }
     
@@ -555,7 +550,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             guard let self = self else { return UIMenu(title: "", children: []) }
             
-            let pinTitle = tracker.isPinned ? "Открепить" : "Закрепить"
+            let pinTitle = tracker.isPinned ? Localization.unPinText : Localization.pinText
             let pinImage = UIImage(systemName: tracker.isPinned ? "pin.slash" : "pin")
             
             let pinAction = UIAction(title: pinTitle, image: pinImage) { [weak self] _ in
@@ -596,9 +591,8 @@ extension TrackersViewController: UICollectionViewDelegate {
                 }
             }
             
-            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { [weak self] _ in
-                print("\(#file):\(#line)] \(#function) Редактировать трекер")
-                
+            let editAction = UIAction(title: Localization.editText, image: UIImage(systemName: "pencil")) { [weak self] _ in
+      
                 AnalyticsService.shared.trackEvent("click", parameters: [
                     "Screen": "Main",
                     "Item": "edit"
@@ -606,18 +600,18 @@ extension TrackersViewController: UICollectionViewDelegate {
             }
             
             let deleteAction = UIAction(
-                title: "Удалить",
+                title: Localization.deleteText,
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { [weak self] _ in
                 guard let self = self else { return }
                 let alert = UIAlertController(
-                    title: "Уверены что хотите удалить трекер?",
+                    title: Localization.deleteTrackerText,
                     message: nil,
                     preferredStyle: .actionSheet
                 )
-                alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
-                alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+                alert.addAction(UIAlertAction(title: Localization.cancelText, style: .cancel))
+                alert.addAction(UIAlertAction(title: Localization.deleteText, style: .destructive) { [weak self] _ in
                     self?.deleteTracker(at: indexPath)
                 })
                 self.present(alert, animated: true)
@@ -662,8 +656,6 @@ extension TrackersViewController: NewHabitControllerDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
             self.updatePlaceholderVisibility()
-            print("\(#file):\(#line)] \(#function) Трекер добавлен в новый массив категорий. Всего категорий: \(self.categories.count)")
-            
         }
     }
 }
@@ -677,11 +669,9 @@ extension TrackersViewController {
             let newTrackers = existingCategory.trackers + [tracker]
             let updatedCategory = TrackerCategory(title: categoryTitle, trackers: newTrackers)
             newCategories[categoryIndex] = updatedCategory
-            print("\(#file):\(#line)] \(#function) Добавлен трекер \(tracker.title) в категорию \(categoryTitle)")
         } else {
             let newCategory = TrackerCategory(title: categoryTitle, trackers: [tracker])
             newCategories.append(newCategory)
-            print("\(#file):\(#line)] \(#function) Создана новая категория \(categoryTitle) с трекером \(tracker.title)")
         }
         categories = newCategories
         collectionView.reloadData()
@@ -690,19 +680,16 @@ extension TrackersViewController {
     
     func deleteTracker(at indexPath: IndexPath) {
         guard indexPath.section < filteredCategories.count else {
-            print("\(#file):\(#line)] \(#function) Ошибка: индекс секции \(indexPath.section) выходит за пределы \(filteredCategories.count)")
             return
         }
         
         let filteredCategory = filteredCategories[indexPath.section]
         guard indexPath.item < filteredCategory.trackers.count else {
-            print("\(#file):\(#line)] \(#function) Ошибка: индекс трекера \(indexPath.item) выходит за пределы \(filteredCategory.trackers.count)")
             return
         }
         
         let trackerToDelete = filteredCategory.trackers[indexPath.item]
         guard let categoryIndex = categories.firstIndex(where: { $0.title == filteredCategory.title }) else {
-            print("\(#file):\(#line)] \(#function) Ошибка: категория не найдена \(filteredCategory.title)")
             return
         }
         
@@ -723,7 +710,6 @@ extension TrackersViewController {
                     filteredCategories = filterTrackersByDate(currentDate)
                     self.collectionView.reloadData()
                     self.updatePlaceholderVisibility()
-                    print("\(#file):\(#line)] \(#function) Трекер успешно удален: \(trackerToDelete.title)")
                     collectionView.reloadData()
                     updatePlaceholderVisibility()
                 }
@@ -743,6 +729,5 @@ extension TrackersViewController: CategoryListControllerDelegate {
     
     func didUpdateCategories(_ categories: [String]) {
         collectionView.reloadData()
-        print("\(#file):\(#line)] \(#function) Обновлены категории: \(categories)")
     }
 }

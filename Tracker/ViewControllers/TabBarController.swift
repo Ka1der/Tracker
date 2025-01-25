@@ -24,7 +24,7 @@ final class TabBarController: UITabBarController {
             .font: UIFont.systemFont(ofSize: 10, weight: .medium)
         ]
         trackers.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: Localization.trackersText,
             image: UIImage(named: "Trackers"),
             selectedImage: nil
         )
@@ -34,7 +34,7 @@ final class TabBarController: UITabBarController {
         let statisticNavigationController = UINavigationController(rootViewController: statisticVC)
         
         statisticNavigationController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: Localization.statisticText,
             image: UIImage(named: "Statistic"),
             selectedImage: nil
         )
