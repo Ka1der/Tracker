@@ -153,12 +153,10 @@ final class TrackerCell: UICollectionViewCell {
         counterLabel.text = "\(completedDaysCount) дней"
         completionHandler?()
         
-        let eventName = "click"
-        let eventParameters: [AnyHashable: Any] = [
-            "Screen" : "Main",
-            "Item" : "track"
-        ]
-        YMMYandexMetrica.reportEvent(eventName, parameters: eventParameters)
+        AnalyticsService.shared.trackEvent("click", parameters: [
+            "Screen": "Main",
+            "Item": "track"
+        ])
     }
     
     // MARK: - Private Methods
