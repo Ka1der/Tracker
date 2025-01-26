@@ -5,10 +5,19 @@
 //  Created by Kaider on 24.01.2025.
 //
 
-import Foundation
 import UIKit
 
 final class StatisticViewController: UIViewController {
+    
+    var rectangleViews: [UIView] = []
+    private var values: [String] = []
+    private let bottomText = ["Лучший период", "Идеальные дни", "Трекеров завершено", "Среднее значение"]
+    private let topPaddingForTitle: CGFloat = 88
+    private let verticalSpacingBetweenTitleAndRectangles: CGFloat = 77
+    private let rectangleHeight: CGFloat = 90
+    private let horizontalSpacing: CGFloat = 12
+    private let screenLeftPadding: CGFloat = 16
+    private let rectangleWidth: CGFloat = UIScreen.main.bounds.width - 32
     
     // MARK: - UI Elements
     
@@ -16,16 +25,9 @@ final class StatisticViewController: UIViewController {
         let label = UILabel()
         label.text = "Статистика"
         label.font = .systemFont(ofSize: 34, weight: .bold)
+        label.textColor = UIColor(named: "categoryTextColor")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-    
-    private lazy var stackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 12
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
     }()
     
     private lazy var placeholderImageView: UIImageView = {
@@ -40,93 +42,57 @@ final class StatisticViewController: UIViewController {
         let label = UILabel()
         label.text = "Анализировать пока нечего"
         label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textColor = UIColor(named: "categoryTextColor")
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private func createMetricView(value: String, description: String) -> UIView {
-        let container = GradientContainerView()
-        container.backgroundColor = .white
-        container.layer.cornerRadius = 16
-        container.clipsToBounds = true
-        container.translatesAutoresizingMaskIntoConstraints = false
-
-        let valueLabel = UILabel()
-        valueLabel.text = value
-        valueLabel.font = .systemFont(ofSize: 34, weight: .bold)
-        valueLabel.textColor = .black
-        valueLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = description
-        descriptionLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        descriptionLabel.textColor = .darkGray
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.lineBreakMode = .byWordWrapping
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        container.addSubview(valueLabel)
-        container.addSubview(descriptionLabel)
-
-        NSLayoutConstraint.activate([
-            container.heightAnchor.constraint(equalToConstant: 90),
-
-            valueLabel.topAnchor.constraint(equalTo: container.topAnchor, constant: 12),
-            valueLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
-
-            descriptionLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12),
-            descriptionLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12)
-        ])
-
-        return container
-    }
-    
-    final class GradientContainerView: UIView {
-        private let gradientLayer = CAGradientLayer()
-
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            setupGradient()
-        }
-
-        required init?(coder: NSCoder) {
-            super.init(coder: coder)
-            setupGradient()
-        }
-
-        private func setupGradient() {
-            gradientLayer.colors = [
-                UIColor(red: 0.99, green: 0.3, blue: 0.29, alpha: 1).cgColor,
-                UIColor(red: 0.27, green: 0.9, blue: 0.62, alpha: 1).cgColor,
-                UIColor(red: 0, green: 0.48, blue: 0.98, alpha: 1).cgColor
-            ]
-            gradientLayer.locations = [0, 0.5, 1]
-            gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
-            gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
-            layer.insertSublayer(gradientLayer, at: 0)
-        }
-
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            gradientLayer.frame = bounds
-        }
-    }
-    
-    // MARK: - Lifecycle
+    // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
+        self.view.backgroundColor = UIColor(named: "background")
+        self.view.addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: topPaddingForTitle),
+            titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: screenLeftPadding),
+        ])
+        
+        fetchAndUpdateStatistics()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateStatistics),
+            name: NSNotification.Name("StatisticsDataDidChange"),
+            object: nil
+        )
+        
+        fetchAndUpdateStatistics()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        stackView.arrangedSubviews.forEach { view in
-            if let gradientLayer = view.layer.sublayers?.first as? CAGradientLayer {
-                gradientLayer.frame = view.bounds
-            }
-        }
+    @objc private func updateStatistics() {
+        print("\(#file):\(#line)] \(#function) Обновление статистики")
+        fetchAndUpdateStatistics()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    
+    private func fetchAndUpdateStatistics() {
+        let statistics = StatisticStore.shared.fetchStatistics()
+        
+        values = [
+            "\(statistics.bestStreak)",
+            "\(statistics.idealDays)",
+            "\(statistics.completedTrackers)",
+            "\(statistics.averageCompletion)%"
+        ]
+        
+        createRectangles()
     }
     
     // MARK: - Setup
@@ -134,29 +100,12 @@ final class StatisticViewController: UIViewController {
     private func setupViews() {
         view.backgroundColor = UIColor(named: "background")
         
-        view.addSubview(titleLabel)
-        view.addSubview(stackView)
         view.addSubview(placeholderImageView)
         view.addSubview(placeholderLabel)
-        
-        let metrics = [
-            ("6", "Лучший период"),
-            ("2", "Идеальные дни"),
-            ("5", "Трекеров завершено"),
-            ("4", "Среднее значение")
-        ]
-        
-        metrics.forEach { value, description in
-            stackView.addArrangedSubview(createMetricView(value: value, description: description))
-        }
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            
-            stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             placeholderImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -167,11 +116,103 @@ final class StatisticViewController: UIViewController {
             placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
-        updatePlaceholderVisibility(!metrics.isEmpty)
+        updatePlaceholderVisibility(false)
     }
     
     private func updatePlaceholderVisibility(_ hasData: Bool) {
         placeholderImageView.isHidden = hasData
         placeholderLabel.isHidden = hasData
+    }
+
+    func createRectangles() {
+        let verticalSpacing = topPaddingForTitle + verticalSpacingBetweenTitleAndRectangles
+        
+        for i in 0..<4 {
+            let rectangleView = UIView()
+            
+            rectangleView.frame = CGRect(
+                x: screenLeftPadding,
+                y: verticalSpacing + CGFloat(i) * (rectangleHeight + horizontalSpacing),
+                width: rectangleWidth,
+                height: rectangleHeight
+            )
+            rectangleView.backgroundColor = UIColor(named: "background")
+            rectangleView.layer.cornerRadius = 16
+            self.view.addSubview(rectangleView)
+            addGradientBorder(to: rectangleView)
+            addValueLabel(to: rectangleView, with: values[i], at: i)
+            addBottomText(to: rectangleView, with: bottomText[i])
+            rectangleViews.append(rectangleView)
+        }
+    }
+    
+    func addGradientBorder(to view: UIView) {
+        let gradientLayer = CAGradientLayer()
+
+        gradientLayer.colors = [
+            UIColor.red.cgColor,
+            UIColor.yellow.cgColor,
+            UIColor.green.cgColor,
+            UIColor.blue.cgColor
+        ]
+        
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        
+        let borderFrame = CGRect(
+            x: view.frame.origin.x - 1,
+            y: view.frame.origin.y - 1,
+            width: view.frame.size.width + 2,
+            height: view.frame.size.height + 2
+        )
+        
+        gradientLayer.frame = borderFrame
+        gradientLayer.cornerRadius = view.layer.cornerRadius
+        gradientLayer.masksToBounds = true
+
+        self.view.layer.insertSublayer(gradientLayer, below: view.layer)
+    }
+    
+    func addValueLabel(to view: UIView, with text: String, at index: Int) {
+        let valueLabel = UILabel()
+        valueLabel.text = text
+        valueLabel.font = .systemFont(ofSize: 34, weight: .bold)
+        valueLabel.textColor = UIColor(named: "categoryTextColor")
+        valueLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(valueLabel)
+       
+        NSLayoutConstraint.activate([
+            valueLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+            valueLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
+        ])
+    }
+    
+    func addBottomText(to view: UIView, with text: String) {
+        let bottomTextLabel = UILabel()
+        bottomTextLabel.text = text
+        bottomTextLabel.font = .systemFont(ofSize: 12)
+        bottomTextLabel.textColor = UIColor(named: "categoryTextColor")
+        bottomTextLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(bottomTextLabel)
+        
+        NSLayoutConstraint.activate([
+            bottomTextLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -12),
+            bottomTextLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
+        ])
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateRectangleColors()
+        }
+    }
+    
+    func updateRectangleColors() {
+        let dynamicColor = UIColor(named: "background")
+        for view in rectangleViews {
+            view.backgroundColor = dynamicColor
+        }
     }
 }

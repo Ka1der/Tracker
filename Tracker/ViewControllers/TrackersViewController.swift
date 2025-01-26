@@ -444,6 +444,7 @@ final class TrackersViewController: UIViewController {
         do {
             let record = TrackerRecord(id: tracker.id, date: date)
             try trackerRecordStore.addNewRecord(record)
+            StatisticStore.shared.updateStatistics()
             print("\(#file):\(#line)] \(#function) Сохранена запись трекера: \(tracker.title)")
         } catch {
             print("\(#file):\(#line)] \(#function) Ошибка сохранения записи трекера: \(error)")
@@ -457,6 +458,7 @@ final class TrackersViewController: UIViewController {
         do {
             try trackerRecordStore.deleteRecord(id: tracker.id, date: date)
             completedTrackers.remove(completedID)
+            StatisticStore.shared.updateStatistics()
             print("\(#file):\(#line)] \(#function) Успешно удалена запись трекера: \(tracker.title)")
             collectionView.reloadData()
         } catch {

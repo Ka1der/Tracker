@@ -19,7 +19,7 @@ final class AnalyticsService {
     
     func initialize(withApiKey apiKey: String) {
         guard let configuration = YMMYandexMetricaConfiguration(apiKey: apiKey) else {
-            print("\(#file):\(#line)] \(#function) Ошибка: не удалось создать конфигурацию YandexMetrica")
+//            print("\(#file):\(#line)] \(#function) Ошибка: не удалось создать конфигурацию YandexMetrica")
             return
         }
         configuration.logs = true
@@ -27,7 +27,7 @@ final class AnalyticsService {
         YMMYandexMetrica.activate(with: configuration)
         isInitialized = true
         
-        print("\(#file):\(#line)] \(#function) YandexMetrica успешно инициализирована")
+//        print("\(#file):\(#line)] \(#function) YandexMetrica успешно инициализирована")
     }
 
     func trackEvent(_ name: String, parameters: [AnyHashable: Any]) {
