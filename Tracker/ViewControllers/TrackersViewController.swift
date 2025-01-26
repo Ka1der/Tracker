@@ -120,7 +120,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var emptyFilterLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ничего не найдено"
+        label.text = Localization.nothingNotFoundText
         label.textColor = .label
         label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false

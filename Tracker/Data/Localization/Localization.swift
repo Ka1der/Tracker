@@ -22,4 +22,6 @@ final class Localization {
     static let editText = NSLocalizedString("edit", comment: "Edit")
     static let deleteText = NSLocalizedString("delete", comment: "Delete")
     static let searchText = NSLocalizedString("search", comment: "Search")
+    static let nothingNotFoundText = NSLocalizedString("nothing.not.found", comment: "Nothing not found")
+    
 }

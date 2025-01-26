@@ -14,7 +14,14 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarController()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            tabBar.layer.borderColor = UIColor(named: "borderColor")?.cgColor
+        }
     }
     
     func tabBarController() {
