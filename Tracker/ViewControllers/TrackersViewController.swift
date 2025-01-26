@@ -10,7 +10,6 @@ import YandexMobileMetrica
 
 final class TrackersViewController: UIViewController {
     
-    
     // MARK: - Properties
     
     let layoutParams = LayoutParams()
@@ -46,7 +45,7 @@ final class TrackersViewController: UIViewController {
             leftInset + rightInset + interItemSpacing * (CGFloat(columnCount) - 1)
         }
     }
-    
+
     // MARK: - UI Elements
     
     private lazy var addButton: UIButton = {
@@ -189,6 +188,10 @@ final class TrackersViewController: UIViewController {
             name: NSNotification.Name("TrackersDataDidChange"),
             object: nil
         )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -60,7 +60,8 @@ final class EditCategoryController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("\(#file):\(#line)] \(#function) Ошибка: init(coder:) не реализован")
+        return nil
     }
     
     // MARK: - Lifecycle

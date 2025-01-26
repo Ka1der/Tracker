@@ -80,7 +80,6 @@ final class StatisticViewController: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-
     
     private func fetchAndUpdateStatistics() {
         let statistics = StatisticStore.shared.fetchStatistics()
