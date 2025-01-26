@@ -5,13 +5,19 @@
 //  Created by Kaider on 24.11.2024.
 //
 
-import Testing
+import XCTest
+import UIKit
+import SnapshotTesting
 @testable import Tracker
 
-struct TrackerTests {
+final class TrackerTests: XCTestCase {
+    func testViewController() {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    }
+           let vc = TrackersViewController()
+           print("View controller создан: \(vc)")
 
+           print("Создание снимка view controller")
+           assertSnapshot(of: vc, as: .image, record: false)
+           print("Снимок успешно создан и проверен")
+       }
 }

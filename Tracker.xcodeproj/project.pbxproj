@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		4CB76CA1B50793D7958321ED /* libPods-TrackerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 77E12B50DF90E52C1279C7E4 /* libPods-TrackerTests.a */; };
 		AFB5128336A5A5C498A1E99F /* Pods_Tracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8841C5B129F3DA291773A092 /* Pods_Tracker.framework */; };
+		C99167E72D461ADE008001BB /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C99167E62D461ADE008001BB /* InlineSnapshotTesting */; };
+		C99167E92D461AE4008001BB /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C99167E82D461AE4008001BB /* SnapshotTesting */; };
 		CEA5E04770A494D2A3D8E132 /* libPods-TrackerUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EE59948FD3E43AC4DBDF509 /* libPods-TrackerUITests.a */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +92,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C99167E92D461AE4008001BB /* SnapshotTesting in Frameworks */,
+				C99167E72D461ADE008001BB /* InlineSnapshotTesting in Frameworks */,
 				4CB76CA1B50793D7958321ED /* libPods-TrackerTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,6 +258,9 @@
 			);
 			mainGroup = C981CC5C2CF3933C00CBF4FA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C99167D92D461676008001BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C981CC662CF3933C00CBF4FA /* Products */;
 			projectDirPath = "";
@@ -604,7 +611,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2F3554K48N;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.yandex.practicum.TrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -624,7 +631,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2F3554K48N;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.yandex.practicum.TrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -711,6 +718,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C99167D92D461676008001BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.17.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C99167E62D461ADE008001BB /* InlineSnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C99167D92D461676008001BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		C99167E82D461AE4008001BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C99167D92D461676008001BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C981CC5D2CF3933C00CBF4FA /* Project object */;
 }
