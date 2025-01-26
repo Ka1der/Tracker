@@ -18,6 +18,7 @@ final class TabBarController: UITabBarController {
     }
     
     func tabBarController() {
+        
         let trackers = UINavigationController(rootViewController: trackerNavigationController)
         
         let trackerText: [NSAttributedString.Key: Any] = [
@@ -43,8 +44,8 @@ final class TabBarController: UITabBarController {
         viewControllers = [trackers, statisticNavigationController]
         
         tabBar.tintColor = UIColor(named: "tabBarTintColor")
-        tabBar.backgroundColor = .white
+        tabBar.backgroundColor = UIColor(named: "background")
         tabBar.layer.borderWidth = 0.5
-        tabBar.layer.borderColor = UIColor.lightGray.cgColor
+        tabBar.layer.borderColor = UIColor(named: "borderColor")?.cgColor
     }
 }

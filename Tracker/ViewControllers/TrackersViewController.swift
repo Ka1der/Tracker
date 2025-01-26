@@ -103,6 +103,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
+     
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
         picker.locale = Locale(identifier: "ru_RU")
@@ -111,7 +112,6 @@ final class TrackersViewController: UIViewController {
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         picker.tintColor = .blue
-        
         if let textLabel = picker.subviews.first?.subviews.first as? UILabel {
             textLabel.font = .systemFont(ofSize: 17)
         }
@@ -141,7 +141,7 @@ final class TrackersViewController: UIViewController {
         layout.headerReferenceSize = CGSize(width: UIScreen.main.bounds.width, height: 50)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = UIColor(named: "background")
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -209,7 +209,7 @@ final class TrackersViewController: UIViewController {
     // MARK: - Setup Methods
     
     private func setupViews() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: "background")
         
         view.addSubview(titleLabel)
         view.addSubview(searchBar)
