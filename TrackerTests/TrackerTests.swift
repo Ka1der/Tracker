@@ -11,13 +11,13 @@ import SnapshotTesting
 @testable import Tracker
 
 final class TrackerTests: XCTestCase {
+    
     func testViewController() {
-
-           let vc = TrackersViewController()
-           print("View controller создан: \(vc)")
-
-           print("Создание снимка view controller")
-           assertSnapshot(of: vc, as: .image, record: false)
-           print("Снимок успешно создан и проверен")
-       }
+        
+        let vc = TrackersViewController()
+        
+        assertSnapshot(of: vc, as: .image(traits: (UITraitCollection(userInterfaceStyle: .light))), record: false)
+        assertSnapshot(of: vc, as: .image(traits: (UITraitCollection(userInterfaceStyle: .dark))), record: false)
+        
+    }
 }
