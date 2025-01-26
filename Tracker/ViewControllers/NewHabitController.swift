@@ -476,8 +476,9 @@ final class NewHabitController: UIViewController {
     }
     
     @objc private func scheduleButtonTapped() {
-        let scheduleController = NewScheduleController()
+        let scheduleController = NewScheduleController(selectedWeekDays: schedule)
         scheduleController.delegate = self
+        print("\(#file):\(#line)] \(#function) Открываем расписание с выбранными днями: \(schedule)")
         present(scheduleController, animated: true)
     }
     
