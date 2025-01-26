@@ -593,6 +593,22 @@ extension TrackersViewController: UICollectionViewDelegate {
             
             let editAction = UIAction(title: Localization.editText, image: UIImage(systemName: "pencil")) { [weak self] _ in
       
+                guard let self = self,
+                      let category = self.categories.first(where: {
+                          $0.trackers.contains(where: { $0.id == tracker.id })
+                      }) else { return }
+
+                let newHabitController = NewHabitController()
+                newHabitController.delegate = self
+                newHabitController.configurator(
+                    tracker: tracker,
+                    categoryTitle: category.title
+                )
+                
+                let navigationController = UINavigationController(rootViewController: newHabitController)
+                navigationController.modalPresentationStyle = .automatic
+                self.present(navigationController, animated: true)
+                
                 AnalyticsService.shared.trackEvent("click", parameters: [
                     "Screen": "Main",
                     "Item": "edit"
@@ -656,6 +672,27 @@ extension TrackersViewController: NewHabitControllerDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
             self.updatePlaceholderVisibility()
+        }
+    }
+    
+    func didUpdateTracker(_ tracker: Tracker, category: String) {
+        do {
+            try trackerStore.updateTracker(tracker)
+            loadTrackersFromStore()
+            
+            if let categoryIndex = categories.firstIndex(where: { $0.title == category }) {
+                var updatedTrackers = categories[categoryIndex].trackers
+                if let trackerIndex = updatedTrackers.firstIndex(where: { $0.id == tracker.id }) {
+                    updatedTrackers[trackerIndex] = tracker
+                    categories[categoryIndex] = TrackerCategory(title: category, trackers: updatedTrackers)
+                }
+            }
+            
+            collectionView.reloadData()
+            updatePlaceholderVisibility()
+            print("\(#file):\(#line)] \(#function) Трекер обновлен: \(tracker.title)")
+        } catch {
+            print("\(#file):\(#line)] \(#function) Ошибка обновления трекера: \(error)")
         }
     }
 }

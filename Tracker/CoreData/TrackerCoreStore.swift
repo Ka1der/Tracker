@@ -36,8 +36,8 @@ final class TrackerCoreStore: TrackerStoreProtocol {
         trackerCoreData.originalCategory = tracker.originalCategory
         
         let categoryRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-           categoryRequest.predicate = NSPredicate(format: "title == %@", category.title)
-           
+        categoryRequest.predicate = NSPredicate(format: "title == %@", category.title)
+        
         
         do {
             try context.save()
@@ -115,7 +115,15 @@ final class TrackerCoreStore: TrackerStoreProtocol {
         do {
             let trackers = try context.fetch(fetchRequest)
             if let trackerToUpdate = trackers.first {
+                trackerToUpdate.title = tracker.title
+                trackerToUpdate.emoji = tracker.emoji
+                trackerToUpdate.color = tracker.color.toHex()
+                trackerToUpdate.schedule = Int64(tracker.schedule.reduce(0) { result, weekDay in
+                    result | (1 << (weekDay.rawValue - 1))
+                })
                 trackerToUpdate.isPinned = tracker.isPinned
+                trackerToUpdate.originalCategory = tracker.originalCategory
+                
                 try context.save()
                 print("\(#file):\(#line)] \(#function) Трекер успешно обновлен: \(tracker.title)")
             } else {

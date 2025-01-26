@@ -20,6 +20,7 @@ final class NewHabitController: UIViewController {
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
+    private var editingTrackerId: UUID?
     
     // MARK: - UI Elements
     
@@ -327,6 +328,76 @@ final class NewHabitController: UIViewController {
         }
     }
     
+    // MARK: - Public Methods
+
+    func configurator(tracker: Tracker, categoryTitle: String) {
+        self.editingTrackerId = tracker.id
+        self.titleLabel.text = "Редактирование привычки"
+        self.nameTextField.text = tracker.title
+        self.selectedCategory = categoryTitle
+        self.selectedEmoji = tracker.emoji
+        self.selectedColor = tracker.color
+        self.schedule = tracker.schedule
+        
+           if let emojiIndex = emojis.emojis.firstIndex(of: tracker.emoji) {
+               emojiCollectionView.selectItem(
+                   at: IndexPath(item: emojiIndex, section: 0),
+                   animated: false,
+                   scrollPosition: []
+               )
+           }
+        
+           if let colorIndex = colors.colors.firstIndex(where: { $0.toHex() == tracker.color.toHex() }) {
+               colorCollectionView.selectItem(
+                   at: IndexPath(item: colorIndex, section: 0),
+                   animated: false,
+                   scrollPosition: []
+               )
+           }
+        updateCreateButtonState()
+        
+        let title = "Категория\n"
+        let attributedString = NSMutableAttributedString(string: title)
+        attributedString.addAttributes(
+            [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ],
+            range: NSRange(location: 0, length: title.count - 1)
+        )
+        let categoryString = NSAttributedString(
+            string: categoryTitle,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor(named: "textGray") ?? .gray
+            ]
+        )
+        attributedString.append(categoryString)
+        categoryButton.setAttributedTitle(attributedString, for: .normal)
+        
+        let weekDays = schedule.map { $0.shortForm }.joined(separator: ", ")
+        let scheduleTitle = "Расписание\n"
+        let scheduleAttributedString = NSMutableAttributedString(string: scheduleTitle)
+        scheduleAttributedString.addAttributes(
+            [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor.black
+            ],
+            range: NSRange(location: 0, length: scheduleTitle.count - 1)
+        )
+        let daysString = NSAttributedString(
+            string: weekDays,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 17),
+                .foregroundColor: UIColor(named: "textGray") ?? .gray
+            ]
+        )
+        scheduleAttributedString.append(daysString)
+        scheduleButton.setAttributedTitle(scheduleAttributedString, for: .normal)
+        
+        print("\(#file):\(#line)] \(#function) Контроллер сконфигурирован для редактирования трекера: \(tracker.title)")
+    }
+    
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
@@ -356,28 +427,51 @@ final class NewHabitController: UIViewController {
         
         let categoryTitle = selectedCategory ?? "Важное"
         
-        let newTracker = Tracker(
-            id: UUID(),
-            title: title,
-            color: color,
-            emoji: emoji,
-            schedule: schedule,
-            isPinned: false,
-            creationDate: nil,
-            originalCategory: categoryTitle
-        )
-        
-        let trackerCategory = TrackerCategory(
-            title: categoryTitle,
-            trackers: [newTracker]
-        )
-        do {
-            try trackerStore.createTracker(newTracker, category: trackerCategory)
-            print("\(#file):\(#line)] \(#function) Трекер сохранен")
-            delegate?.didCreateTracker(newTracker, category: categoryTitle)
-            dismiss(animated: true)
-        } catch {
-            print("\(#file):\(#line)] \(#function) Ошибка сохранения трекера: \(error)")
+        if let editingId = editingTrackerId {
+            let updatedTracker = Tracker(
+                id: editingId,
+                title: title,
+                color: color,
+                emoji: emoji,
+                schedule: schedule,
+                isPinned: false,
+                creationDate: nil,
+                originalCategory: categoryTitle
+            )
+            
+            do {
+                try trackerStore.updateTracker(updatedTracker)
+                print("\(#file):\(#line)] \(#function) Трекер обновлен: \(title)")
+                delegate?.didUpdateTracker(updatedTracker, category: categoryTitle)
+                dismiss(animated: true)
+            } catch {
+                print("\(#file):\(#line)] \(#function) Ошибка обновления трекера: \(error)")
+            }
+        } else {
+            let newTracker = Tracker(
+                id: UUID(),
+                title: title,
+                color: color,
+                emoji: emoji,
+                schedule: schedule,
+                isPinned: false,
+                creationDate: nil,
+                originalCategory: categoryTitle
+            )
+            
+            let trackerCategory = TrackerCategory(
+                title: categoryTitle,
+                trackers: [newTracker]
+            )
+            
+            do {
+                try trackerStore.createTracker(newTracker, category: trackerCategory)
+                print("\(#file):\(#line)] \(#function) Трекер создан: \(title)")
+                delegate?.didCreateTracker(newTracker, category: categoryTitle)
+                dismiss(animated: true)
+            } catch {
+                print("\(#file):\(#line)] \(#function) Ошибка создания трекера: \(error)")
+            }
         }
     }
     
