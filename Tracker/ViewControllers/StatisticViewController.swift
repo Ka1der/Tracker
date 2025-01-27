@@ -60,8 +60,6 @@ final class StatisticViewController: UIViewController {
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: screenLeftPadding),
         ])
         
-        fetchAndUpdateStatistics()
-        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateStatistics),
