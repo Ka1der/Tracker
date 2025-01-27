@@ -338,6 +338,7 @@ final class NewHabitController: UIViewController {
         self.selectedEmoji = tracker.emoji
         self.selectedColor = tracker.color
         self.schedule = tracker.schedule
+        self.createButton.setTitle("Сохранить", for: .normal)
         
            if let emojiIndex = emojis.emojis.firstIndex(of: tracker.emoji) {
                emojiCollectionView.selectItem(
