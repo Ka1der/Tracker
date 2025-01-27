@@ -19,7 +19,7 @@ final class SupplementaryView: UICollectionReusableView {
     
     func configure(with title: String, color: UIColor = .black) {
         titleLabel.text = title
-        titleLabel.textColor = color
+        titleLabel.textColor = UIColor(named: "categoryTextColor")
     }
     
     override init(frame: CGRect) {

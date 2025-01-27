@@ -1,0 +1,23 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Kaider on 16.01.2025.
+  
+*/
+
+"emptyState.title" = "What are we going to track?";
+"delete.comfirmation" = "Are you sure you want to delete the tracker?";
+"cancel" = "Cancel";
+"filters" = "Filters";
+"trackers" = "Trackers";
+"statistic" = "Statistic";
+"day" = "day";
+"days" = "days";
+"pin" = "Pin";
+"unpin" = "Unpin";
+"edit" = "Edit";
+"delete" = "Delete";
+"search" = "Search";
+"nothing.not.found" = "Nothing not found";
+
