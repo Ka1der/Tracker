@@ -21,6 +21,7 @@ final class NewHabitController: UIViewController {
     private var selectedColor: UIColor?
     private let trackerStore: TrackerStoreProtocol = TrackerStore.shared
     private var editingTrackerId: UUID?
+    private var completedDaysCount: Int = 0
     
     // MARK: - UI Elements
     
@@ -30,6 +31,16 @@ final class NewHabitController: UIViewController {
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var numbersOfDaysLabel: UILabel = {
+        let label = UILabel()
+        label.text = "5 дней"
+        label.font = .systemFont(ofSize: 32, weight: .bold)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isHidden = true
         return label
     }()
     
@@ -218,6 +229,7 @@ final class NewHabitController: UIViewController {
         view.addSubview(cancelButton)
         view.addSubview(createButton)
         
+        scrollView.addSubview(numbersOfDaysLabel)
         scrollView.addSubview(titleLabel)
         scrollView.addSubview(nameTextField)
         scrollView.addSubview(categoryButton)
@@ -240,7 +252,13 @@ final class NewHabitController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             
-            nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            numbersOfDaysLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            numbersOfDaysLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            
+            nameTextField.topAnchor.constraint(
+                equalTo: numbersOfDaysLabel.isHidden ? titleLabel.bottomAnchor : numbersOfDaysLabel.bottomAnchor, constant: 24
+                       ),
+            
             nameTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
             nameTextField.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),
@@ -331,8 +349,10 @@ final class NewHabitController: UIViewController {
     // MARK: - Public Methods
 
     func configurator(tracker: Tracker, categoryTitle: String) {
+        numbersOfDaysLabel.isHidden = false
+        titleLabel.text = "Редактирование привычки"
+        createButton.setTitle("Сохранить", for: .normal)
         self.editingTrackerId = tracker.id
-        self.titleLabel.text = "Редактирование привычки"
         self.nameTextField.text = tracker.title
         self.selectedCategory = categoryTitle
         self.selectedEmoji = tracker.emoji
@@ -397,6 +417,27 @@ final class NewHabitController: UIViewController {
         scheduleButton.setAttributedTitle(scheduleAttributedString, for: .normal)
         
         print("\(#file):\(#line)] \(#function) Контроллер сконфигурирован для редактирования трекера: \(tracker.title)")
+    }
+    
+    private func formatDaysCount(_ count: Int) -> String {
+        let mod10 = count % 10
+        let mod100 = count % 100
+        
+        if mod10 == 1 && mod100 != 11 {
+            return "\(count) день"
+        } else if (mod10 >= 2 && mod10 <= 4) && !(mod100 >= 12 && mod100 <= 14) {
+            return "\(count) дня"
+        } else {
+            return "\(count) дней"
+        }
+    }
+    
+    func setCompletedDaysCount(_ count: Int) {
+        self.completedDaysCount = count
+        let formattedText = formatDaysCount(count)
+        numbersOfDaysLabel.text = formattedText
+        numbersOfDaysLabel.isHidden = false
+        print("\(#file):\(#line)] \(#function) Установлено количество дней: \(count)")
     }
     
     // MARK: - Actions

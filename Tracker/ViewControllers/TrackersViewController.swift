@@ -603,6 +603,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                           $0.trackers.contains(where: { $0.id == tracker.id })
                       }) else { return }
 
+                let completedDays = self.countCompletedDays(for: tracker)
                 let newHabitController = NewHabitController()
                 newHabitController.delegate = self
                 newHabitController.configurator(
@@ -610,9 +611,10 @@ extension TrackersViewController: UICollectionViewDelegate {
                     categoryTitle: category.title
                 )
                 
-                let navigationController = UINavigationController(rootViewController: newHabitController)
-                navigationController.modalPresentationStyle = .automatic
-                self.present(navigationController, animated: true)
+                let days = self.countCompletedDays(for: tracker)
+                  newHabitController.setCompletedDaysCount(days)
+                
+                self.present(newHabitController, animated: true)
                 
                 AnalyticsService.shared.trackEvent("click", parameters: [
                     "Screen": "Main",
