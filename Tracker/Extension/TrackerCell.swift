@@ -215,14 +215,10 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func pluralizeDays(_ count: Int) -> String {
-        let mod10 = count % 10
-        let mod100 = count % 100
-        
-        if mod10 == 1 && mod100 != 11 {
-            return "\(count) \(Localization.dayText)"
-        } else {
-            return "\(count) \(Localization.daysText)"
-        }
+        let format = NSLocalizedString("dayCount",
+                                     tableName: "LocalizableDays",
+                                     comment: "Number of days")
+        return String.localizedStringWithFormat(format, count)
     }
 }
 
