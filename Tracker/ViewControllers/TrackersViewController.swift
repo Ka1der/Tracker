@@ -21,6 +21,7 @@ final class TrackersViewController: UIViewController {
     private let trackerRecordStore = TrackerRecordStore()
     private let trackerCategoryStore = TrackerCategoryStore()
     private var currentFilter: FilterType = .allTrackers
+    private var searchText: String = ""
     let bottomInset: CGFloat = 80
     let params: [AnyHashable: Any] = [
         "key1": "value1",
@@ -181,7 +182,7 @@ final class TrackersViewController: UIViewController {
         updatePlaceholderVisibility()
         loadTrackersFromStore()
         loadTrackerRecords()
-        
+        searchBar.delegate = self
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleDataUpdate),
@@ -223,6 +224,7 @@ final class TrackersViewController: UIViewController {
         view.addSubview(filterButton)
         view.addSubview(emptyFilterLabel)
         view.addSubview(emptyFilterImage)
+        setupTapGestureForKeyboardDismiss()
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
@@ -293,6 +295,7 @@ final class TrackersViewController: UIViewController {
         
         let filteredCategories = categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
+                
                 let isIrregularEvent = tracker.schedule.count == 1 && tracker.creationDate != nil
                 if isIrregularEvent {
                     let isCompletedInAnyDay = completedTrackers.contains { completedID in
@@ -373,6 +376,12 @@ final class TrackersViewController: UIViewController {
         emptyFilterLabel.isHidden = hasVisibleTrackers || !isFiltering
         emptyFilterImage.isHidden = hasVisibleTrackers || !isFiltering
         collectionView.isHidden = !hasVisibleTrackers
+        
+        if !searchText.isEmpty && filteredCategories.isEmpty {
+                emptyFilterLabel.text = "Ничего не найдено"
+            } else {
+                emptyFilterLabel.text = Localization.nothingNotFoundText
+            }
     }
     
     private func isFutureDate(_ date: Date) -> Bool {
@@ -531,6 +540,16 @@ final class TrackersViewController: UIViewController {
         collectionView.reloadData()
         updatePlaceholderVisibility()
         print("\(#file):\(#line)] \(#function) Применен фильтр: \(filter.rawValue)")
+    }
+    
+    private func setupTapGestureForKeyboardDismiss() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 
@@ -773,5 +792,44 @@ extension TrackersViewController: CategoryListControllerDelegate {
     
     func didUpdateCategories(_ categories: [String]) {
         collectionView.reloadData()
+    }
+}
+
+extension TrackersViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        self.searchText = searchText.lowercased()
+        
+        if searchText.isEmpty {
+            filteredCategories = filterTrackersByDate(currentDate)
+        } else {
+            let dateFiltered = filterTrackersByDate(currentDate)
+            filteredCategories = dateFiltered.compactMap { category in
+                let filteredTrackers = category.trackers.filter { tracker in
+                    tracker.title.lowercased().contains(self.searchText)
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+            }
+        }
+        
+        updatePlaceholderVisibility()
+        collectionView.reloadData()
+        print("\(#file):\(#line)] \(#function) Поиск по запросу: \(searchText)")
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.setShowsCancelButton(true, animated: true)
+        print("\(#file):\(#line)] \(#function) Начат ввод поискового запроса")
+        return true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.setShowsCancelButton(false, animated: true)
+        searchBar.resignFirstResponder()
+        searchText = ""
+        filteredCategories = filterTrackersByDate(currentDate)
+        updatePlaceholderVisibility()
+        collectionView.reloadData()
+        print("\(#file):\(#line)] \(#function) Поиск отменен")
     }
 }
