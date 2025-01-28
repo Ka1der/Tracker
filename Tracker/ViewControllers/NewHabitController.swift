@@ -73,6 +73,7 @@ final class NewHabitController: UIViewController {
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
         button.backgroundColor = UIColor(named: "backgroundGray")
+        button.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         button.layer.cornerRadius = 16
         button.tintColor = .gray
         button.titleLabel?.numberOfLines = 0
@@ -85,12 +86,14 @@ final class NewHabitController: UIViewController {
         button.setTitleColor(.black, for: .normal)
         button.contentHorizontalAlignment = .left
         button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 0)
+        button.titleLabel?.font = .systemFont(ofSize: 17)
         button.titleLabel?.numberOfLines = 0
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(scheduleButtonTapped), for: .touchUpInside)
         let chevronImage = UIImage(systemName: "chevron.right")?.withRenderingMode(.alwaysTemplate)
         button.setImage(chevronImage, for: .normal)
         button.backgroundColor = UIColor(named: "backgroundGray")
+        button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         button.layer.cornerRadius = 16
         button.tintColor = .gray
         return button
