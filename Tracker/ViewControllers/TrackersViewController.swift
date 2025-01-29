@@ -371,18 +371,19 @@ final class TrackersViewController: UIViewController {
     private func updatePlaceholderVisibility() {
         let hasVisibleTrackers = !filteredCategories.isEmpty
         let isFiltering = currentFilter != .allTrackers
-        
-        placeholderStack.isHidden = hasVisibleTrackers || isFiltering
-        emptyFilterLabel.isHidden = hasVisibleTrackers || !isFiltering
-        emptyFilterImage.isHidden = hasVisibleTrackers || !isFiltering
+        let isSearching = !searchText.isEmpty
+
+        placeholderStack.isHidden = hasVisibleTrackers || isFiltering || isSearching
+        emptyFilterLabel.isHidden = hasVisibleTrackers || (!isFiltering && !isSearching)
+        emptyFilterImage.isHidden = hasVisibleTrackers || (!isFiltering && !isSearching)
+
         collectionView.isHidden = !hasVisibleTrackers
-        
-        if !searchText.isEmpty && filteredCategories.isEmpty {
-                emptyFilterLabel.text = "Ничего не найдено"
-            } else {
-                emptyFilterLabel.text = Localization.nothingNotFoundText
-            }
+
+        if isSearching && filteredCategories.isEmpty {
+            emptyFilterLabel.text = Localization.nothingNotFoundText
+        }
     }
+    
     
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current

@@ -6,7 +6,7 @@
   
 */
 
-"emptyState.title" = "Что хотите удалить?";
+"emptyState.title" = "Что будем отслеживать?";
 "delete.comfirmation" = "Уверены что хотите удалить трекер?";
 "cancel" = "Отменить";
 "filters" = "Фильтры";
