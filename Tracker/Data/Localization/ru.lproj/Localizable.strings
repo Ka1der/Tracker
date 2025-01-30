@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Kaider on 16.01.2025.
+  
+*/
+
+"emptyState.title" = "Что будем отслеживать?";
+"delete.comfirmation" = "Уверены что хотите удалить трекер?";
+"cancel" = "Отменить";
+"filters" = "Фильтры";
+"trackers" = "Трекеры";
+"statistic" = "Статистика";
+"day" = "дня";
+"days" = "дней";
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"edit" = "Редактировать";
+"delete" = "Удалить";
+"search" = "Поиск";
+"nothing.not.found" = "Ничего не найдено";
